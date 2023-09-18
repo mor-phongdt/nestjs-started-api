@@ -1,44 +1,19 @@
 import { Module } from '@nestjs/common';
-import {
-  getDataSourceToken,
-  getRepositoryToken,
-  TypeOrmModule,
-} from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { customUsersRepository } from './users.repository';
-import { User } from './users.entity';
+import { PrismaModule } from 'src/database/prisma.module';
+import { PrismaService } from 'src/database/prisma.service';
 
 @Module({
   imports: [
     ConfigModule,
-    // PassportModule.register({ defaultStrategy: 'jwt' }),
-    // JwtModule.registerAsync({
-    //   imports: [ConfigModule],
-    //   inject: [ConfigService],
-    //   useFactory: async (configService: ConfigService) => ({
-    //     secret: configService.get('JWT_SECRET'),
-    //     signOptions: {
-    //       expiresIn: 3600,
-    //     },
-    //   }),
-    // }),
-    TypeOrmModule.forFeature([User]),
+    PrismaModule
   ],
   providers: [
     AuthService,
-    {
-      provide: getRepositoryToken(User),
-      inject: [getDataSourceToken()],
-      useFactory(dataSource: DataSource) {
-        // Override default repository for Task with a custom one
-        return dataSource.getRepository(User).extend(customUsersRepository);
-      },
-    },
+    PrismaService
   ],
   controllers: [AuthController],
-  // exports: [JwtStrategy, PassportModule],
 })
 export class AuthModule {}
