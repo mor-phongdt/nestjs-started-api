@@ -12,7 +12,7 @@ services:
     ports:
       - '5431:5432'
 
-  app:
+  js4ver-app:
     build:
       context: .
       dockerfile: Dockerfile
@@ -37,3 +37,12 @@ services:
       - '5050:80'
     depends_on:
       - db
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./.nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - js4ver-app
