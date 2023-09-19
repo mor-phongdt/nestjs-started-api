@@ -48,10 +48,16 @@ export class AuthService {
             email: user.email,
           });
           return { access_token };
-        } else throw new UnauthorizedException();
+        }
+      } else {
+        throw new UnauthorizedException();
       }
-    } catch (err) {
-      throw new InternalServerErrorException();
+    } catch (error) {
+      if (error) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException();
+      }
     }
   }
 
