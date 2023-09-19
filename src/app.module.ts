@@ -5,7 +5,7 @@ import { AuthModule } from './modules/auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: [`.env.stage.${process.env.STAGE}`],
+      envFilePath: [`.env`],
     }),
     AuthModule,
   ],
