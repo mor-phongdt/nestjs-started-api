@@ -10,7 +10,7 @@ services:
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     ports:
-      - '5431:5432'
+      - '60001:5432'
 
   js4ver-app:
     build:
