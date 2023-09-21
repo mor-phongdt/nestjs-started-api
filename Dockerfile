@@ -3,8 +3,6 @@ FROM node:18 AS builder
 # Create app directory
 WORKDIR /app
 
-ADD https://raw.githubusercontent.com/eficode/wait-for/master/wait-for /wait-for
-RUN chmod +x /wait-for
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 COPY package*.json ./
 # Install app dependencies
@@ -23,6 +21,6 @@ COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 
-
 EXPOSE 3000
-# 👇 new migrate and start app s
+# 👇 new migrate and start app script
+CMD [  "npm", "run", "start:migrate:prod" ]

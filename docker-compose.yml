@@ -13,6 +13,11 @@ services:
       - postgres:/var/lib/postgresql/data
     ports:
       - '6000:5432'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   pgadmin:
     image: dpage/pgadmin4
@@ -24,11 +29,7 @@ services:
     ports:
       - '50004:80'
     depends_on:
-      - postgres
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 5s
-      timeout: 5s   
+      - postgres 
 
   nginx:
     image: nginx:latest
@@ -44,7 +45,6 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: nest-docker-postgres
-    command: ["/wait-for", "postgres:6000", "--", "npm", "run", "start:migrate:prod"]
     ports:
       - '50002:3000'
     depends_on:
