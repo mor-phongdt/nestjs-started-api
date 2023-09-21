@@ -24,4 +24,4 @@ RUN npx prisma generate
 
 EXPOSE 3000
 # 👇 new migrate and start app script
-CMD [  "npm", "run", "start:migrate:prod" ]
+CMD [  "./run-it.sh" ]
