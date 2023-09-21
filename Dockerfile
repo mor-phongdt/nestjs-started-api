@@ -6,7 +6,7 @@ WORKDIR /app
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 COPY package*.json ./
 # Install app dependencies
-ADD https://raw.githubusercontent.com/eficode/wait-for/master/wait-for /wait-for
+ADD https://raw.githubusercontent.com/eficode/wait-for/master/wait-for /app/wait-for
 RUN chmod +x /app/wait-for
 
 RUN npm install
