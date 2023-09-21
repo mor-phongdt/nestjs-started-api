@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package*.json ./
 # Install app dependencies
 ADD https://raw.githubusercontent.com/eficode/wait-for/master/wait-for /wait-for
-RUN chmod +x /wait-for
+RUN chmod +x /app/wait-for
 
 RUN npm install
 
