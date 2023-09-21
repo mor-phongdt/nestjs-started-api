@@ -22,6 +22,6 @@ COPY --from=builder /app/prisma ./prisma
 RUN npx prisma generate
 
 
-EXPOSE 50001
+EXPOSE 3000
 # 👇 new migrate and start app script
 CMD [  "npm", "run", "start:migrate:prod" ]
