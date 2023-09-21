@@ -14,7 +14,7 @@
     "start:prod": "STAGE=prod node dist/main",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init ",
-    "start:migrate:prod": "./wait-for db:6000 && prisma migrate deploy && npm run start:prod",
+    "start:migrate:prod": "sh -c './wait-for db:6000 -- echo 'The api is up! Let's use it' && prisma migrate deploy && npm run start:prod",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
