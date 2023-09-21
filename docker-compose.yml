@@ -7,7 +7,6 @@ services:
     restart: always
     environment:
       - POSTGRES_PASSWORD=postgres
-    command: ["./wait-for", "postgres:6000", "--", "npm", "run", "start:prod"]
     container_name: postgres
     volumes:
       - postgres:/var/lib/postgresql/data
@@ -41,6 +40,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: nest-docker-postgres
+    command: ["./wait-for", "postgres:6000", "--", "npm", "run", "start:prod"]
     ports:
       - '50002:3000'
     depends_on:
