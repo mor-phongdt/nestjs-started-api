@@ -19,6 +19,8 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
+RUN npx prisma generate
+
 
 EXPOSE 50001
 # 👇 new migrate and start app script
