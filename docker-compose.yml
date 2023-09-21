@@ -7,17 +7,13 @@ services:
     restart: always
     environment:
       - POSTGRES_PASSWORD=postgres
-      
+    command: ["./wait-for", "postgres:6000", "--", "npm", "run", "start:prod"]
     container_name: postgres
     volumes:
       - postgres:/var/lib/postgresql/data
     ports:
       - '6000:5432'
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+
 
   pgadmin:
     image: dpage/pgadmin4
