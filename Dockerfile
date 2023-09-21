@@ -18,6 +18,8 @@ RUN npm run build
 RUN npx prisma generate
 
 FROM node:18
+RUN apk update && apk add bash && apk add --no-cache coreutils
+
 
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
