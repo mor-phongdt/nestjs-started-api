@@ -15,7 +15,6 @@ RUN chmod +x /app/wait-for
 RUN npx prisma generate
 
 RUN npm run build
-RUN npx prisma generate
 
 FROM node:18
 
@@ -23,6 +22,6 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/wait-for ./prisma
+COPY --from=builder /app/wait-for ./
 EXPOSE 3000
 # 👇 new migrate and start app script
