@@ -2,29 +2,29 @@ version: '3.5'
 
 services:
 
-  postgres:
+  js4everdb:
     image: postgres
     restart: always
     environment:
       - POSTGRES_PASSWORD=postgres
-    container_name: postgres
+    container_name: js4everdb
     volumes:
       - postgres:/var/lib/postgresql/data
     ports:
-      - '6000:5432'
+      - '6000:5433'
 
 
   pgadmin:
     image: dpage/pgadmin4
     restart: always
-    container_name: nest-pgadmin4
+    container_name: js4ver-pgadmin4
     environment:
       - PGADMIN_DEFAULT_EMAIL=admin@admin.com
       - PGADMIN_DEFAULT_PASSWORD=pgadmin4
     ports:
       - '50004:80'
     depends_on:
-      - postgres 
+      - js4everdb 
 
   nginx:
     image: nginx:latest
@@ -39,14 +39,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: nest-docker-postgres
-    command: ["./wait-for", "localhost:6000", "--", "npm", "run", "start:prod"]
+    container_name: js4ver-app
+    command: ["./wait-for", "js4everdb:6000", "--", "npm", "run", "start:prod"]
     ports:
       - '50002:3000'
     depends_on:
-      - postgres
+      - js4everdb
     links:
-      - postgres
+      - js4everdb
     volumes:
       - ./src:/app/src
     env_file:
