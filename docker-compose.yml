@@ -11,7 +11,7 @@ services:
     volumes:
       - postgres:/var/lib/postgresql/data
     ports:
-      - '60001:5434'
+      - '60001:5432'
 
 
   pgadmin:
