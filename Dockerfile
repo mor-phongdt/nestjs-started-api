@@ -1,4 +1,5 @@
 FROM node:18 AS builder
+RUN apt-get -q update && apt-get -qy install netcat
 
 # Create app directory
 WORKDIR /app
@@ -11,7 +12,6 @@ RUN npm install
 
 COPY . .
 RUN chmod +x /app/wait-for
-RUN apt install -y netcat
 
 RUN npx prisma generate
 
