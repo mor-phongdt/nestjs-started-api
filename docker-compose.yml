@@ -40,7 +40,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: nest-docker-postgres
-    command: ["./wait-for", "postgres:6000", "--", "npm", "run", "start:prod"]
+    command: ["./wait-for", "localhost:6000", "--", "npm", "run", "start:prod"]
     ports:
       - '50002:3000'
     depends_on:
