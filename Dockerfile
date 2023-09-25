@@ -11,6 +11,7 @@ RUN npm install
 
 COPY . .
 RUN chmod +x /app/wait-for
+RUN apt install -y netcat
 
 RUN npx prisma generate
 
