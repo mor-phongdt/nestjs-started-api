@@ -1,5 +1,5 @@
 FROM node:18 AS builder
-RUN apt-get -q update && apt-get -qy install netcat
+RUN apt-get -q update && apt-get -qy install netcat-traditional
 
 # Create app directory
 WORKDIR /app
