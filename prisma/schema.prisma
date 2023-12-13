@@ -11,7 +11,7 @@ datasource db {
 }
 
 model User {
-  id        BigInt    @id @default(autoincrement())
+  id        Int    @id @default(autoincrement())
   email     String    @unique
   password  String
   nickname  String?
@@ -25,15 +25,15 @@ model User {
 }
 
 model Challenge {
-  id            BigInt   @id @default(autoincrement())
-  title         String   @unique
+  id            Int   @id @default(autoincrement())
+  title         String
   description   String
   spendTime     Int?
-  userCompleted Int
+  userCompleted Int? @default(0)
   level         Int?
-  authorId      BigInt
-  codeTemplate  String
-  codeSolution  String
+  authorId      Int
+  codeTemplate  Json
+  codeSolution  Json
   createdAt     DateTime @default(now()) @db.Timestamptz(3)
   updatedAt     DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 
@@ -42,9 +42,9 @@ model Challenge {
 }
 
 model SubmissionChallenge {
-  id          BigInt   @id @default(autoincrement())
-  challengeId BigInt
-  userId      BigInt
+  id          Int   @id @default(autoincrement())
+  challengeId Int
+  userId      Int
   code        String
   language    String
   createdAt   DateTime @default(now()) @db.Timestamptz(3)

@@ -9,9 +9,15 @@ async function bootstrap() {
     .setTitle('Js4ver Project')
     .setVersion('1.0')
     .addTag('js4ver')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
+  app.enableCors();
 
   await app.listen(3000);
 }

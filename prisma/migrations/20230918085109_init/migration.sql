@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "User" ALTER COLUMN "last_login" SET DATA TYPE TIMESTAMPTZ(3);
