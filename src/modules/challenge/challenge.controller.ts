@@ -8,7 +8,7 @@ import {
   HttpStatus,
   Request,
 } from '@nestjs/common';
-import { ApiBody, ApiHeader, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ChallengeService } from 'src/modules/challenge/challenge.service';
 import { ChallengeDto } from './dto/challenge-dto';
 

@@ -38,7 +38,6 @@ export class ChallengeService {
       if (challenge) return { data: challenge };
       else throw new NotFoundException('Challenge not found');
     } catch (error) {
-      console.log(error)
       throw error;
     }
   }
