@@ -1,5 +1,5 @@
 import {
-  Headers,
+  Param,
   Body,
   Controller,
   Get,
@@ -8,11 +8,12 @@ import {
   HttpStatus,
   Request,
 } from '@nestjs/common';
-import { ApiBody, ApiHeader, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBody, ApiHeader, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ChallengeService } from 'src/modules/challenge/challenge.service';
 import { ChallengeDto } from './dto/challenge-dto';
 
-@Controller('challenge')
+@ApiTags('challenge')
+@Controller('api/challenge')
 @ApiBearerAuth()
 export class ChallengeController {
   constructor(private readonly challengeService: ChallengeService) {}
@@ -21,6 +22,12 @@ export class ChallengeController {
   @Get('/')
   getListChallenge() {
     return this.challengeService.getListChallenge();
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get(':id')
+  getDetailUser(@Param('id') id: number): Promise<any> {
+    return this.challengeService.getDetailChallenge(id);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -34,6 +41,7 @@ export class ChallengeController {
       ...challengeDto,
       codeTemplate: JSON.stringify(challengeDto.codeTemplate),
       codeSolution: JSON.stringify(challengeDto.codeSolution),
+      codeTest: JSON.stringify(challengeDto.codeTest),
       authorId: req.user.id,
     });
   }

@@ -19,8 +19,26 @@ export class ChallengeService {
     }
   }
 
-  async getListChallenge(): Promise<any> {
-    const users = await this.prisma.challenge.findMany();
-    if (users) return { data: users };
+  async getListChallenge(): Promise<{ data: any[] }> {
+    try {
+      const listChallenge = await this.prisma.challenge.findMany();
+      if (listChallenge) return { data: listChallenge };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getDetailChallenge(id: number): Promise<{ data: any }> {
+    try {
+      const challenge = await this.prisma.challenge.findUnique({
+        where: {
+          id,
+        },
+      });
+      if (challenge) return { data: challenge };
+      else throw new NotFoundException('Challenge not found');
+    } catch (error) {
+      throw error;
+    }
   }
 }

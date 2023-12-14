@@ -50,4 +50,21 @@ export class ChallengeDto {
   @ValidateNested()
   @ApiProperty()
   codeSolution: NestedJsonDto;
+
+  @IsObject()
+  @ValidateNested()
+  @ApiProperty()
+  codeTest: NestedJsonDto;
+
+  @ApiProperty()
+  frameworkId: number;
+
+  @ApiProperty()
+  category: string;
+
+  @ApiProperty()
+  status: number;
+
+  @ApiProperty()
+  type: number;
 }
