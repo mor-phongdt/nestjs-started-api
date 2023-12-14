@@ -31,7 +31,7 @@ export class ChallengeController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Post('/create-challenge')
+  @Post('/create')
   @ApiBody({ type: ChallengeDto })
   createChallenge(
     @Request() req: Record<string, any>,
@@ -45,13 +45,4 @@ export class ChallengeController {
       authorId: req.user.id,
     });
   }
-
-  // @HttpCode(HttpStatus.OK)
-  // @Post('/login')
-  // @ApiBody({ type: AuthCredentialsDto })
-  // signIn(
-  //   @Body() authCredentialsDto: AuthCredentialsDto,
-  // ): Promise<{ accessToken: string }> {
-  //   return this.authService.signIn(authCredentialsDto);
-  // }
 }
