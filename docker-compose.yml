@@ -48,7 +48,7 @@ services:
     links:
       - js4everdb
     volumes:
-      - ./src:/app/src
+      - ./src:/src
     env_file:
       - .env
 volumes:
