@@ -11,45 +11,88 @@ datasource db {
 }
 
 model User {
-  id        Int    @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   email     String    @unique
   password  String
   nickname  String?
   avatarUrl String?
   lastLogin DateTime? @db.Timestamptz(3)
+  theme_ide String?   @default("default")
   createdAt DateTime  @default(now()) @db.Timestamptz(3)
   updatedAt DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
 
-  Challenges          Challenge[]
-  SubmissionChallenge SubmissionChallenge[]
+  challenges          Challenge[]
+  submissionChallenge SubmissionChallenge[]
 }
 
 model Challenge {
-  id            Int   @id @default(autoincrement())
-  title         String
-  description   String
-  spendTime     Int?
-  userCompleted Int? @default(0)
-  level         Int?
-  authorId      Int
-  codeTemplate  Json
-  codeSolution  Json
-  createdAt     DateTime @default(now()) @db.Timestamptz(3)
-  updatedAt     DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+  id                  Int      @id @default(autoincrement())
+  title               String
+  description         String
+  spendTime           Int?
+  userCompleted       Int?     @default(0)
+  level               Int?
+  authorId            Int
+  codeTemplate        Json
+  codeSolution        Json
+  codeTest            Json
+  solutionDescription String?
+  frameworkId         Int
+  category            String
+  status              Int      @default(1)
+  type                Int
+  createdAt           DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt           DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 
   author              User                  @relation(fields: [authorId], references: [id])
-  SubmissionChallenge SubmissionChallenge[]
+  framework           LanguageFramework     @relation(fields: [frameworkId], references: [id])
+  submissionChallenge SubmissionChallenge[]
+  studySeriresChallenge StudySeriresChallenge[]
 }
 
 model SubmissionChallenge {
-  id          Int   @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   challengeId Int
   userId      Int
   code        String
-  language    String
-  createdAt   DateTime @default(now()) @db.Timestamptz(3)
-  updatedAt   DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+  status      Int       @default(0)
+  startTime   DateTime  @db.Timestamptz(3)
+  endTime     DateTime  @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
+  challenge   Challenge @relation(fields: [challengeId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+}
 
-  challenge Challenge @relation(fields: [challengeId], references: [id])
-  user      User      @relation(fields: [userId], references: [id])
+model LanguageFramework {
+  id   Int    @id @default(autoincrement())
+  name String
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
+
+  challenge Challenge[]
+}
+
+model StudySerires {
+  id   Int    @id @default(autoincrement())
+  name String
+  description String
+  image_url String?
+  status Int @default(1)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
+
+  studySeriresChallenge StudySeriresChallenge[]
+}
+
+model StudySeriresChallenge {
+  id          Int       @id @default(autoincrement())
+  seriesId    Int
+  challengeId      Int
+
+  challenge   Challenge @relation(fields: [challengeId], references: [id])
+  studySeries        StudySerires      @relation(fields: [seriesId], references: [id])
+
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
 }
