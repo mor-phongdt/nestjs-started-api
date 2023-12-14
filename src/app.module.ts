@@ -7,7 +7,7 @@ import { ChallengeModule } from './modules/challenge/challenge.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: [`.env`],
+      envFilePath: [`.env.local`],
     }),
     AuthModule,
     UserModule,
