@@ -1,16 +1,9 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  HttpCode,
-  HttpStatus,
-} from '@nestjs/common';
+import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { Public } from './decorators/public.decorator';
-
+import { Response } from 'express';
 @ApiTags('auth')
 @Controller('api/auth')
 @Public()
@@ -29,7 +22,8 @@ export class AuthController {
   @ApiBody({ type: AuthCredentialsDto })
   signIn(
     @Body() authCredentialsDto: AuthCredentialsDto,
+    res: Response,
   ): Promise<{ accessToken: string }> {
-    return this.authService.signIn(authCredentialsDto);
+    return this.authService.signIn(authCredentialsDto, res);
   }
 }

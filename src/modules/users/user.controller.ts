@@ -1,46 +1,81 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  HttpCode,
-  HttpStatus,
-  Param,
-  UseGuards,
-} from '@nestjs/common';
-import { ApiBody, ApiHeader, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { UserService } from 'src/modules/users/user.service';
+import { Controller, Get, Param, HttpStatus, Delete } from '@nestjs/common';
+import { UserService } from './user.service';
+import { ApiBearerAuth, ApiTags, ApiResponse } from '@nestjs/swagger';
+import { Public } from '../auth/decorators/public.decorator';
 
-@ApiTags('user')
+@ApiTags('users')
 @Controller('api/user')
 @ApiBearerAuth()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // @Get('/test')
-  // test() {
-  //   return 'abc';
-  // }
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'List of users is fetched successfully.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized.',
+  })
+  @Get()
+  getUsers(): Promise<void> {
+    return this.userService.getUsers();
+  }
 
-  // @HttpCode(HttpStatus.OK)
-  // @Post('/signup')
-  // @ApiBody({ type: AuthCredentialsDto })
-  // signUp(@Body() authCredentialsDto: AuthCredentialsDto): Promise<void> {
-  //   return this.authService.signUp(authCredentialsDto);
-  // }
-
-  // @HttpCode(HttpStatus.OK)
-  // @Post('/login')
-  // @ApiBody({ type: AuthCredentialsDto })
-  // signIn(
-  //   @Body() authCredentialsDto: AuthCredentialsDto,
-  // ): Promise<{ accessToken: string }> {
-  //   return this.authService.signIn(authCredentialsDto);
-  // }
-
-  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'A user is fetched successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized.',
+  })
   @Get(':id')
-  getDetailUser(@Param('id') id: number): Promise<any> {
-    return this.userService.getUserById(Number(id));
+  getUserById(@Param('id') id: number): Promise<any> {
+    return this.userService.getUserById(id);
+  }
+
+  // @ApiBearerAuth()
+  // @ApiResponse({
+  //   status: HttpStatus.OK,
+  //   description: 'A user is updated successfully',
+  // })
+  // @ApiResponse({
+  //   status: HttpStatus.UNAUTHORIZED,
+  //   description: 'Unauthorized.',
+  // })
+  // @ApiResponse({
+  //   status: HttpStatus.NOT_FOUND,
+  //   description: 'Not Found.',
+  // })
+  // @ApiConsumes('multipart/form-data')
+  // @Patch(':id')
+  // @UseInterceptors(FileInterceptor('file'))
+  // updateUser(
+  //   @Param('id') id: number,
+  //   @Body() data: UsersDto,
+  //   @UploadedFile() file: Express.Multer.File,
+  // ): Promise<any> {
+  //   return this.UserService.updateUser(id, data, file);
+  // }
+
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'A user is fetched successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized.',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Not Found.',
+  })
+  @Delete(':id')
+  deleteUser(@Param('id') id: number): Promise<any> {
+    return this.userService.deleteUser(id);
   }
 }
