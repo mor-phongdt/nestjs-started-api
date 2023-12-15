@@ -9,7 +9,6 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/database/prisma.service';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -35,7 +34,7 @@ export class AuthService {
     }
   }
 
-  async signIn(data: Prisma.UserCreateInput, res: Response): Promise<any> {
+  async signIn(data: Prisma.UserCreateInput): Promise<any> {
     try {
       const { email, password } = data;
       const user = await this.prisma.user.findUnique({
@@ -50,7 +49,7 @@ export class AuthService {
             id: user.id,
             email: user.email,
           });
-          return res.send({ access_token });
+          return { access_token };
         }
       } else {
         throw new UnauthorizedException();

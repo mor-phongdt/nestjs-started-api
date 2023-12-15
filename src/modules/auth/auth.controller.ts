@@ -1,9 +1,8 @@
 import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { Public } from './decorators/public.decorator';
-import { Response } from 'express';
 @ApiTags('auth')
 @Controller('api/auth')
 @Public()
@@ -17,13 +16,36 @@ export class AuthController {
     return this.authService.signUp(authCredentialsDto);
   }
 
-  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Login successfully.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Invalid credentials.',
+  })
   @Post('/login')
-  @ApiBody({ type: AuthCredentialsDto })
   signIn(
     @Body() authCredentialsDto: AuthCredentialsDto,
-    res: Response,
   ): Promise<{ accessToken: string }> {
-    return this.authService.signIn(authCredentialsDto, res);
+    return this.authService.signIn(authCredentialsDto);
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Reset password successfully.',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Invalid credentials.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Invalid credentials.',
+  })
+  @Post('/reset')
+  resetPassword(@Body() data: any) {
+    return this.authService.resetPassword(data);
   }
 }
