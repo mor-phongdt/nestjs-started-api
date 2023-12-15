@@ -48,7 +48,7 @@ export class AuthService {
             id: user.id,
             email: user.email,
           });
-          return { id: user.id, access_token };
+          return { access_token };
         }
       } else {
         throw new UnauthorizedException();

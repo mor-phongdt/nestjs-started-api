@@ -6,12 +6,11 @@ import {
   HttpStatus,
   Delete,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiTags, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
-import { Request } from 'express';
+import { User } from './decorators/user.decorator';
 
 @ApiTags('users')
 @Controller('api/user')
@@ -48,10 +47,10 @@ export class UserController {
     description: 'Unauthorized.',
   })
   @Get('/profile')
-  getUserProfile(@Req() req: Request): Promise<any> {
-    const jwt = req.headers.authorization.replace('Bearer ', '');
-    const json = this.jwtService.decode(jwt, { json: true }) as { id: number };
-    return this.userService.getUserById(json.id);
+  getUserProfile(
+    @User() user: { id: number; email: string; iat: number; exp: number },
+  ): Promise<any> {
+    return this.userService.getUserById(user.id);
   }
 
   @UseGuards(JwtAuthGuard)
