@@ -1,3 +1,4 @@
+import { JwtService } from '@nestjs/jwt';
 import {
   Controller,
   Get,
@@ -5,16 +6,21 @@ import {
   HttpStatus,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiTags, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
+import { Request } from 'express';
 
 @ApiTags('users')
 @Controller('api/user')
 @ApiBearerAuth()
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -29,6 +35,23 @@ export class UserController {
   @Get()
   getUsers(): Promise<void> {
     return this.userService.getUsers();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Profile is fetched',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized.',
+  })
+  @Get('/profile')
+  getUserProfile(@Req() req: Request): Promise<any> {
+    const jwt = req.headers.authorization.replace('Bearer ', '');
+    const json = this.jwtService.decode(jwt, { json: true }) as { id: number };
+    return this.userService.getUserById(json.id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -69,7 +92,6 @@ export class UserController {
   // ): Promise<any> {
   //   return this.UserService.updateUser(id, data, file);
   // }
-
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiResponse({
