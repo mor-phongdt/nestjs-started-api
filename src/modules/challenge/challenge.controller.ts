@@ -35,7 +35,7 @@ export class ChallengeController {
 
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  @Post('/create-challenge')
+  @Post('/create')
   @ApiBody({ type: ChallengeDto })
   createChallenge(
     @Request() req: Record<string, any>,

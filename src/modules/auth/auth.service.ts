@@ -25,7 +25,6 @@ export class AuthService {
       await this.prisma.user.create({ data });
       return { message: 'success' };
     } catch (error) {
-      console.log(error);
       if (error.code === 'P2002') {
         throw new ConflictException('Email already exists');
       } else {

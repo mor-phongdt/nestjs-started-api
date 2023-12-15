@@ -27,7 +27,7 @@ CREATE TABLE "Challenge" (
     "codeTest" JSONB NOT NULL,
     "solutionDescription" TEXT,
     "frameworkId" INTEGER NOT NULL,
-    "category" TEXT NOT NULL,
+    "category" INTEGER NOT NULL,
     "status" INTEGER NOT NULL DEFAULT 1,
     "type" INTEGER NOT NULL,
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -55,6 +55,7 @@ CREATE TABLE "SubmissionChallenge" (
 CREATE TABLE "LanguageFramework" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
+    "imageUrl" TEXT NOT NULL,
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
