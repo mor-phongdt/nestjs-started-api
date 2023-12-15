@@ -7,10 +7,12 @@ import {
   HttpCode,
   HttpStatus,
   Request,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiBody, ApiHeader, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ChallengeService } from 'src/modules/challenge/challenge.service';
 import { ChallengeDto } from './dto/challenge-dto';
+import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 
 @ApiTags('challenge')
 @Controller('api/challenge')
@@ -18,6 +20,7 @@ import { ChallengeDto } from './dto/challenge-dto';
 export class ChallengeController {
   constructor(private readonly challengeService: ChallengeService) {}
 
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Get('/')
   getListChallenge() {
@@ -30,6 +33,7 @@ export class ChallengeController {
     return this.challengeService.getDetailChallenge(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('/create-challenge')
   @ApiBody({ type: ChallengeDto })
@@ -45,13 +49,4 @@ export class ChallengeController {
       authorId: req.user.id,
     });
   }
-
-  // @HttpCode(HttpStatus.OK)
-  // @Post('/login')
-  // @ApiBody({ type: AuthCredentialsDto })
-  // signIn(
-  //   @Body() authCredentialsDto: AuthCredentialsDto,
-  // ): Promise<{ accessToken: string }> {
-  //   return this.authService.signIn(authCredentialsDto);
-  // }
 }
