@@ -1,46 +1,116 @@
+import { JwtService } from '@nestjs/jwt';
 import {
-  Body,
   Controller,
   Get,
-  Post,
-  HttpCode,
-  HttpStatus,
   Param,
+  HttpStatus,
+  Delete,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBody, ApiHeader, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { UserService } from 'src/modules/users/user.service';
+import { UserService } from './user.service';
+import { ApiBearerAuth, ApiTags, ApiResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt.guard';
+import { User } from './decorators/user.decorator';
 
-@ApiTags('user')
+type UserType = {
+  id: number;
+  email: string;
+  iat: number;
+  exp: number;
+};
+@ApiTags('users')
 @Controller('api/user')
 @ApiBearerAuth()
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+  ) {}
 
-  // @Get('/test')
-  // test() {
-  //   return 'abc';
-  // }
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'List of users is fetched successfully.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized.',
+  })
+  @Get()
+  getUsers(): Promise<void> {
+    return this.userService.getUsers();
+  }
 
-  // @HttpCode(HttpStatus.OK)
-  // @Post('/signup')
-  // @ApiBody({ type: AuthCredentialsDto })
-  // signUp(@Body() authCredentialsDto: AuthCredentialsDto): Promise<void> {
-  //   return this.authService.signUp(authCredentialsDto);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Profile is fetched',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized.',
+  })
+  @Get('/profile')
+  getUserProfile(@User() user: UserType): Promise<any> {
+    return this.userService.getUserById(user.id);
+  }
 
-  // @HttpCode(HttpStatus.OK)
-  // @Post('/login')
-  // @ApiBody({ type: AuthCredentialsDto })
-  // signIn(
-  //   @Body() authCredentialsDto: AuthCredentialsDto,
-  // ): Promise<{ accessToken: string }> {
-  //   return this.authService.signIn(authCredentialsDto);
-  // }
-
-  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'A user is fetched successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized.',
+  })
   @Get(':id')
-  getDetailUser(@Param('id') id: number): Promise<any> {
-    return this.userService.getUserById(Number(id));
+  getUserById(@Param('id') id: number): Promise<any> {
+    return this.userService.getUserById(id);
+  }
+
+  // @ApiBearerAuth()
+  // @ApiResponse({
+  //   status: HttpStatus.OK,
+  //   description: 'A user is updated successfully',
+  // })
+  // @ApiResponse({
+  //   status: HttpStatus.UNAUTHORIZED,
+  //   description: 'Unauthorized.',
+  // })
+  // @ApiResponse({
+  //   status: HttpStatus.NOT_FOUND,
+  //   description: 'Not Found.',
+  // })
+  // @ApiConsumes('multipart/form-data')
+  // @Patch(':id')
+  // @UseInterceptors(FileInterceptor('file'))
+  // updateUser(
+  //   @Param('id') id: number,
+  //   @Body() data: UsersDto,
+  //   @UploadedFile() file: Express.Multer.File,
+  // ): Promise<any> {
+  //   return this.UserService.updateUser(id, data, file);
+  // }
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'A user is fetched successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized.',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Not Found.',
+  })
+  @Delete(':id')
+  deleteUser(@Param('id') id: number): Promise<any> {
+    return this.userService.deleteUser(id);
   }
 }
