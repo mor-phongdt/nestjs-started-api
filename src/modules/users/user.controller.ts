@@ -12,6 +12,12 @@ import { ApiBearerAuth, ApiTags, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { User } from './decorators/user.decorator';
 
+type UserType = {
+  id: number;
+  email: string;
+  iat: number;
+  exp: number;
+};
 @ApiTags('users')
 @Controller('api/user')
 @ApiBearerAuth()
@@ -47,9 +53,7 @@ export class UserController {
     description: 'Unauthorized.',
   })
   @Get('/profile')
-  getUserProfile(
-    @User() user: { id: number; email: string; iat: number; exp: number },
-  ): Promise<any> {
+  getUserProfile(@User() user: UserType): Promise<any> {
     return this.userService.getUserById(user.id);
   }
 
