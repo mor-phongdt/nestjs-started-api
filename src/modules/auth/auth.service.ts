@@ -49,7 +49,7 @@ export class AuthService {
             id: user.id,
             email: user.email,
           });
-          return { access_token };
+          return { id: user.id, access_token };
         }
       } else {
         throw new UnauthorizedException();
