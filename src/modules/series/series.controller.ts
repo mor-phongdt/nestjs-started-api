@@ -12,8 +12,9 @@ export class SeriesController {
   @Get('/list?')
   getListSeriesChallenge(
     @Query('tab') tab: string,
-    @Query('page') page: string
+    @Query('page') page: string,
+    @Query('limit') limit: string
   ) {
-    return this.seriesService.getListSeriesChallenge(tab, page)
+    return this.seriesService.getListSeriesChallenge(tab, page, limit)
   }
 }
