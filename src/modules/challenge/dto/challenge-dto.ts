@@ -60,7 +60,7 @@ export class ChallengeDto {
   frameworkId: number;
 
   @ApiProperty()
-  category: string;
+  category: number;
 
   @ApiProperty()
   status: number;
