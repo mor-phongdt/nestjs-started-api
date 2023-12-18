@@ -4,6 +4,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/users/user.module';
 import { ChallengeModule } from './modules/challenge/challenge.module';
 import { SeriesModule } from './modules/series/series.module';
+import { PrismaModule } from './database/prisma.module';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { SeriesModule } from './modules/series/series.module';
     AuthModule,
     UserModule,
     ChallengeModule,
-    SeriesModule
+    SeriesModule,
+    PrismaModule,
   ],
   controllers: [],
   providers: [],
