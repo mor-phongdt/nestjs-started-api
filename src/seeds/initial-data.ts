@@ -46,6 +46,10 @@ async function seed() {
         },
       });
     }
+
+  await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"User"', 'id'), coalesce(max(id)+1, 1), false) FROM "User";`;
+  await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"LanguageFramework"', 'id'), coalesce(max(id)+1, 1), false) FROM "LanguageFramework";`;
+  await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Challenge"', 'id'), coalesce(max(id)+1, 1), false) FROM "Challenge";`;
   } catch (error) {
     console.error('Error seeding initial data:', error);
   } finally {
