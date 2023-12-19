@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/database/prisma.service';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -111,6 +112,38 @@ export class AuthService {
         },
       });
       return { message: 'Reset password successfully.' };
+    } catch (error) {
+      return { status: error.code, message: error.message };
+    }
+  }
+
+  async loginSocial(req: Request): Promise<any> {
+    try {
+      const reqUser: any = req.user;
+      const { email, firstName, lastName, picture } = reqUser;
+      const nickname = firstName + ' ' + lastName;
+      const avatarUrl = picture;
+      const user = await this.prisma.user.findUnique({
+        where: {
+          email,
+        },
+      });
+      if (!user) {
+        const newUser = await this.prisma.user.create({
+          data: {
+            email,
+            nickname,
+            avatarUrl,
+            password: '',
+          },
+        });
+
+        const access_token = await this.handleLogin({ id: newUser.id, email });
+        return { access_token };
+      } else {
+        const access_token = await this.handleLogin({ id: user.id, email });
+        return { access_token };
+      }
     } catch (error) {
       return { status: error.code, message: error.message };
     }
