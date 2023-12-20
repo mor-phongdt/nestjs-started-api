@@ -34,7 +34,7 @@ export class ChallengeDto {
   @ApiProperty()
   spendTime: number;
 
-  @ApiProperty()
+  @ApiProperty({ example: 1, description: 'from 1 to 3' })
   level: number;
 
   @IsObject()
@@ -52,17 +52,17 @@ export class ChallengeDto {
   @ApiProperty()
   codeTest: NestedJsonDto;
 
-  @ApiProperty()
+  @ApiProperty({ example: 1, description: 'from 1 to 5' })
   frameworkId: number;
 
   @IsEnum(ChallengeCategoryEnum, { message: 'Invalid value' })
-  @ApiProperty()
+  @ApiProperty({ example: 'coding', description: 'coding or system_design' })
   category: ChallengeCategoryEnum;
 
   @ApiProperty()
   status: number;
 
   @IsEnum(ChallengeTypeEnum, { message: 'Invalid value' })
-  @ApiProperty()
+  @ApiProperty({ example: 'preview', description: 'preview or console' })
   type: ChallengeTypeEnum;
 }

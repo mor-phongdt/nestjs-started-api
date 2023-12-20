@@ -21,6 +21,9 @@ export class SubmissionChallengeDto {
   code: NestedJsonDto;
 
   //0: not completed,1:draft, 999: completed
-  @ApiProperty()
+  @ApiProperty({
+    example: '1',
+    description: '0: not completed,1:draft, 999: completed',
+  })
   status: number;
 }
