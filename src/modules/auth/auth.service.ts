@@ -25,7 +25,7 @@ export class AuthService {
     data.password = await bcrypt.hash(password, salt);
     try {
       await this.prisma.user.create({ data });
-      return { message: 'success' };
+      return { statusCode: '200', message: 'success' };
     } catch (error) {
       if (error.code === 'P2002') {
         throw new ConflictException('Email already exists');
@@ -50,7 +50,7 @@ export class AuthService {
             id: user.id,
             email: user.email,
           });
-          return { access_token };
+          return { statusCode: '200', access_token };
         }
       } else {
         throw new UnauthorizedException();
@@ -115,7 +115,7 @@ export class AuthService {
           password,
         },
       });
-      return { message: 'Reset password successfully.' };
+      return { statusCode: '200', message: 'Reset password successfully.' };
     } catch (error) {
       throw error;
     }
@@ -143,10 +143,10 @@ export class AuthService {
         });
 
         const access_token = await this.handleLogin({ id: newUser.id, email });
-        return { access_token };
+        return { statusCode: '200', access_token };
       } else {
         const access_token = await this.handleLogin({ id: user.id, email });
-        return { access_token };
+        return { statusCode: '200', access_token };
       }
     } catch (error) {
       throw error;

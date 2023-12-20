@@ -8,7 +8,7 @@ export class UserService {
     try {
       const data = await this.prisma.user.findMany();
 
-      return { data: data };
+      return { statusCode: '200', data: data };
     } catch (error) {
       throw error;
     }
@@ -26,7 +26,7 @@ export class UserService {
         throw new NotFoundException();
       }
 
-      return { data: user };
+      return { statusCode: '200', data: user };
     } catch (error) {
       throw error;
     }
@@ -83,7 +83,7 @@ export class UserService {
         throw new NotFoundException();
       }
 
-      return { message: 'deleted successfully' };
+      return { statusCode: '200', message: 'deleted successfully' };
     } catch (error) {
       throw error;
     }

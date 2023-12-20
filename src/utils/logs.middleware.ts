@@ -10,7 +10,7 @@ class LogsMiddleware implements NestMiddleware {
       const { method, originalUrl } = request;
       const { statusCode, statusMessage } = response;
 
-      const message = `${method} ${originalUrl} ${statusCode} ${statusMessage}`;
+      const message = `[${method}] ${originalUrl}: ${statusCode} - ${statusMessage}`;
 
       if (statusCode >= 500) {
         return this.logger.error(message);
