@@ -2,7 +2,7 @@ import {
   IsString,
   Matches,
   MaxLength,
-  MinLength,
+  IsEnum,
   IsObject,
   ValidateNested,
 } from 'class-validator';
@@ -14,21 +14,17 @@ class NestedJsonDto {
   nestedProperty: string;
 }
 
-export class ChallengeDto {
-  // @ApiProperty()
-  // @IsString()
-  // @MinLength(4)
-  // @MaxLength(20)
-  // email: string;
+export enum ChallengeTypeEnum {
+  preview = 'preview',
+  console = 'console',
+}
 
-  // @ApiProperty()
-  // @IsString()
-  // @MinLength(8)
-  // @MaxLength(32)
-  // @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-  //   message: 'password is too weak',
-  // })
-  // password: string;
+export enum ChallengeCategoryEnum {
+  coding = 'coding',
+  system_design = 'system_design',
+}
+
+export class ChallengeDto {
   @ApiProperty()
   title: string;
 
@@ -59,12 +55,14 @@ export class ChallengeDto {
   @ApiProperty()
   frameworkId: number;
 
+  @IsEnum(ChallengeCategoryEnum, { message: 'Invalid value' })
   @ApiProperty()
-  category: number;
+  category: ChallengeCategoryEnum;
 
   @ApiProperty()
   status: number;
 
+  @IsEnum(ChallengeTypeEnum, { message: 'Invalid value' })
   @ApiProperty()
-  type: number;
+  type: ChallengeTypeEnum;
 }

@@ -1,6 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import { codeSample, language, sampleMarkdown } from './users-data';
+import {
+  ChallengeCategoryEnum,
+  ChallengeTypeEnum,
+} from '../modules/challenge/dto/challenge-dto';
 const bcrypt = require('bcrypt');
 
 const prisma = new PrismaClient();
@@ -40,16 +44,32 @@ async function seed() {
           frameworkId: Number(
             [1, 2, 3, 4, 5][Math.floor(Math.random() * [1, 2, 3, 4, 5].length)],
           ),
-          category: Number([1, 2][Math.floor(Math.random() * [1, 2].length)]),
+          category: [
+            ChallengeCategoryEnum.coding,
+            ChallengeCategoryEnum.system_design,
+          ][
+            Math.floor(
+              Math.random() *
+                [
+                  ChallengeCategoryEnum.coding,
+                  ChallengeCategoryEnum.system_design,
+                ].length,
+            )
+          ],
           status: 1,
-          type: Number([1, 2][Math.floor(Math.random() * [1, 2].length)]),
+          type: [ChallengeTypeEnum.preview, ChallengeTypeEnum.preview][
+            Math.floor(
+              Math.random() *
+                [ChallengeTypeEnum.preview, ChallengeTypeEnum.preview].length,
+            )
+          ],
         },
       });
     }
 
-  await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"User"', 'id'), coalesce(max(id)+1, 1), false) FROM "User";`;
-  await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"LanguageFramework"', 'id'), coalesce(max(id)+1, 1), false) FROM "LanguageFramework";`;
-  await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Challenge"', 'id'), coalesce(max(id)+1, 1), false) FROM "Challenge";`;
+    await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"User"', 'id'), coalesce(max(id)+1, 1), false) FROM "User";`;
+    await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"LanguageFramework"', 'id'), coalesce(max(id)+1, 1), false) FROM "LanguageFramework";`;
+    await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Challenge"', 'id'), coalesce(max(id)+1, 1), false) FROM "Challenge";`;
   } catch (error) {
     console.error('Error seeding initial data:', error);
   } finally {
