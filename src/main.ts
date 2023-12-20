@@ -3,7 +3,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as passport from 'passport';
 import * as session from 'express-session';
-import { WinstonModule } from 'nest-winston';
+import { utilities, WinstonModule } from 'nest-winston';
 import { transports, format } from 'winston';
 import 'winston-daily-rotate-file';
 
@@ -31,11 +31,11 @@ async function bootstrap() {
         }),
         new transports.Console({
           format: format.combine(
-            format.cli(),
-            format.splat(),
             format.timestamp(),
-            format.printf((info) => {
-              return `${info.timestamp} ${info.level}: ${info.message}`;
+            format.ms(),
+            utilities.format.nestLike('J4E-BE', {
+              colors: true,
+              prettyPrint: true,
             }),
           ),
         }),
