@@ -1,13 +1,19 @@
 import { PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import { codeSample, language, sampleMarkdown } from './users-data';
-import {
-  ChallengeCategoryEnum,
-  ChallengeTypeEnum,
-} from '../modules/challenge/dto/challenge-dto';
 const bcrypt = require('bcrypt');
 
 const prisma = new PrismaClient();
+
+export enum ChallengeTypeEnum {
+  preview = 'preview',
+  console = 'console',
+}
+
+export enum ChallengeCategoryEnum {
+  coding = 'coding',
+  system_design = 'system_design',
+}
 
 async function seed() {
   try {
