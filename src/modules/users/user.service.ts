@@ -10,7 +10,7 @@ export class UserService {
 
       return { data: data };
     } catch (error) {
-      return { status: error.code, message: error.message };
+      throw error;
     }
   }
 
@@ -28,7 +28,7 @@ export class UserService {
 
       return { data: user };
     } catch (error) {
-      return { status: error.code, message: error.message };
+      throw error;
     }
   }
 
@@ -85,7 +85,7 @@ export class UserService {
 
       return { message: 'deleted successfully' };
     } catch (error) {
-      return { status: error.code, message: error.message };
+      throw error;
     }
   }
 }

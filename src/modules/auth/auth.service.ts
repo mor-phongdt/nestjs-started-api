@@ -4,6 +4,7 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
   NotFoundException,
+  HttpException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/database/prisma.service';
@@ -56,7 +57,10 @@ export class AuthService {
       }
     } catch (error) {
       if (error) {
-        throw error;
+        throw new HttpException(
+          error.message,
+          error.code ? error.code : error.status,
+        );
       } else {
         throw new InternalServerErrorException();
       }
@@ -113,7 +117,7 @@ export class AuthService {
       });
       return { message: 'Reset password successfully.' };
     } catch (error) {
-      return { status: error.code, message: error.message };
+      throw error;
     }
   }
 
@@ -145,7 +149,7 @@ export class AuthService {
         return { access_token };
       }
     } catch (error) {
-      return { status: error.code, message: error.message };
+      throw error;
     }
   }
 }
