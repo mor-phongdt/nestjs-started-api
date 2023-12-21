@@ -86,9 +86,9 @@ export class ChallengeService {
           },
         },
       });
-      if (challenge)
+      if (challenge) {
         return { data: excludeField(challenge, ['authorId', 'frameworkId']) };
-      else throw new NotFoundException('Challenge not found');
+      } else throw new NotFoundException('Challenge not found');
     } catch (error) {
       throw error;
     }
@@ -162,9 +162,11 @@ export class ChallengeService {
             },
           },
         });
+      console.log(submissionChallenge);
       if (submissionChallenge) return { data: submissionChallenge };
+      else throw new NotFoundException('Challenge not start');
     } catch (error) {
-      throw error;
+      throw new InternalServerErrorException();
     }
   }
 }
