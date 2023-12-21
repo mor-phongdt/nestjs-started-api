@@ -166,7 +166,7 @@ export class ChallengeService {
       if (submissionChallenge) return { data: submissionChallenge };
       else throw new NotFoundException('Challenge not start');
     } catch (error) {
-      throw new InternalServerErrorException();
+      throw error
     }
   }
 }
