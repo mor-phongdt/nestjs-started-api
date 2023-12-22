@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/users/user.module';
 import { ChallengeModule } from './modules/challenge/challenge.module';
+import { WordModule } from './modules/words/word.module';
 import { PrismaModule } from './database/prisma.module';
 
 @Module({
@@ -13,6 +14,7 @@ import { PrismaModule } from './database/prisma.module';
     AuthModule,
     UserModule,
     ChallengeModule,
+    WordModule,
     PrismaModule,
   ],
   controllers: [],
