@@ -10,6 +10,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ChallengeType {
+  preview
+  console
+}
+
+enum ChallengeCategory {
+  coding
+  system_design
+}
+
 model User {
   id        Int       @id @default(autoincrement())
   email     String    @unique
@@ -17,6 +27,7 @@ model User {
   nickname  String?
   avatarUrl String?
   lastLogin DateTime? @db.Timestamptz(3)
+  position String?
   theme_ide String?   @default("default")
   createdAt DateTime  @default(now()) @db.Timestamptz(3)
   updatedAt DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
@@ -39,9 +50,9 @@ model Challenge {
   codeTest            Json
   solutionDescription String?
   frameworkId         Int
-  category            Int
+  category            ChallengeCategory @default(value: coding)
   status              Int      @default(1)
-  type                Int
+  type                ChallengeType @default(value: preview)
   createdAt           DateTime @default(now()) @db.Timestamptz(3)
   updatedAt           DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 
@@ -52,17 +63,17 @@ model Challenge {
 }
 
 model SubmissionChallenge {
-  id          Int       @id @default(autoincrement())
   challengeId Int
   userId      Int
-  code        String
+  code        String?
   status      Int       @default(0)
   startTime   DateTime  @db.Timestamptz(3)
-  endTime     DateTime  @db.Timestamptz(3)
+  endTime     DateTime?  @db.Timestamptz(3)
   createdAt   DateTime  @default(now()) @db.Timestamptz(3)
   updatedAt   DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
   challenge   Challenge @relation(fields: [challengeId], references: [id])
   user        User      @relation(fields: [userId], references: [id])
+  @@id([challengeId, userId])
 }
 
 model LanguageFramework {

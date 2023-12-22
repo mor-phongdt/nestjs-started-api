@@ -1,3 +1,9 @@
+-- CreateEnum
+CREATE TYPE "ChallengeType" AS ENUM ('preview', 'console');
+
+-- CreateEnum
+CREATE TYPE "ChallengeCategory" AS ENUM ('coding', 'system_design');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
@@ -6,6 +12,7 @@ CREATE TABLE "User" (
     "nickname" TEXT,
     "avatarUrl" TEXT,
     "lastLogin" TIMESTAMPTZ(3),
+    "position" TEXT,
     "theme_ide" TEXT DEFAULT 'default',
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -27,9 +34,9 @@ CREATE TABLE "Challenge" (
     "codeTest" JSONB NOT NULL,
     "solutionDescription" TEXT,
     "frameworkId" INTEGER NOT NULL,
-    "category" INTEGER NOT NULL,
+    "category" "ChallengeCategory" NOT NULL DEFAULT 'coding',
     "status" INTEGER NOT NULL DEFAULT 1,
-    "type" INTEGER NOT NULL,
+    "type" "ChallengeType" NOT NULL DEFAULT 'preview',
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -38,17 +45,16 @@ CREATE TABLE "Challenge" (
 
 -- CreateTable
 CREATE TABLE "SubmissionChallenge" (
-    "id" SERIAL NOT NULL,
     "challengeId" INTEGER NOT NULL,
     "userId" INTEGER NOT NULL,
-    "code" TEXT NOT NULL,
+    "code" TEXT,
     "status" INTEGER NOT NULL DEFAULT 0,
     "startTime" TIMESTAMPTZ(3) NOT NULL,
-    "endTime" TIMESTAMPTZ(3) NOT NULL,
+    "endTime" TIMESTAMPTZ(3),
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "SubmissionChallenge_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "SubmissionChallenge_pkey" PRIMARY KEY ("challengeId","userId")
 );
 
 -- CreateTable

@@ -2,7 +2,7 @@ import {
   IsString,
   Matches,
   MaxLength,
-  MinLength,
+  IsEnum,
   IsObject,
   ValidateNested,
 } from 'class-validator';
@@ -14,21 +14,17 @@ class NestedJsonDto {
   nestedProperty: string;
 }
 
-export class ChallengeDto {
-  // @ApiProperty()
-  // @IsString()
-  // @MinLength(4)
-  // @MaxLength(20)
-  // email: string;
+export enum ChallengeTypeEnum {
+  preview = 'preview',
+  console = 'console',
+}
 
-  // @ApiProperty()
-  // @IsString()
-  // @MinLength(8)
-  // @MaxLength(32)
-  // @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-  //   message: 'password is too weak',
-  // })
-  // password: string;
+export enum ChallengeCategoryEnum {
+  coding = 'coding',
+  system_design = 'system_design',
+}
+
+export class ChallengeDto {
   @ApiProperty()
   title: string;
 
@@ -38,7 +34,7 @@ export class ChallengeDto {
   @ApiProperty()
   spendTime: number;
 
-  @ApiProperty()
+  @ApiProperty({ example: 1, description: 'from 1 to 3' })
   level: number;
 
   @IsObject()
@@ -56,15 +52,17 @@ export class ChallengeDto {
   @ApiProperty()
   codeTest: NestedJsonDto;
 
-  @ApiProperty()
+  @ApiProperty({ example: 1, description: 'from 1 to 5' })
   frameworkId: number;
 
-  @ApiProperty()
-  category: number;
+  @IsEnum(ChallengeCategoryEnum, { message: 'Invalid value' })
+  @ApiProperty({ example: 'coding', description: 'coding or system_design' })
+  category: ChallengeCategoryEnum;
 
   @ApiProperty()
   status: number;
 
-  @ApiProperty()
-  type: number;
+  @IsEnum(ChallengeTypeEnum, { message: 'Invalid value' })
+  @ApiProperty({ example: 'preview', description: 'preview or console' })
+  type: ChallengeTypeEnum;
 }
