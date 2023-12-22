@@ -23,6 +23,7 @@ model User {
 
   challenges          Challenge[]
   submissionChallenge SubmissionChallenge[]
+  StudySeries         StudySeries[]
 }
 
 model Challenge {
@@ -44,10 +45,10 @@ model Challenge {
   createdAt           DateTime @default(now()) @db.Timestamptz(3)
   updatedAt           DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 
-  author              User                  @relation(fields: [authorId], references: [id])
-  framework           LanguageFramework     @relation(fields: [frameworkId], references: [id])
-  submissionChallenge SubmissionChallenge[]
-  studySeriresChallenge StudySeriresChallenge[]
+  author               User                   @relation(fields: [authorId], references: [id])
+  framework            LanguageFramework      @relation(fields: [frameworkId], references: [id])
+  submissionChallenge  SubmissionChallenge[]
+  studySeriesChallenge StudySeriesChallenge[]
 }
 
 model SubmissionChallenge {
@@ -65,35 +66,40 @@ model SubmissionChallenge {
 }
 
 model LanguageFramework {
-  id   Int    @id @default(autoincrement())
-  name String
+  id        Int      @id @default(autoincrement())
+  name      String
   imageUrl  String
-  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
-  updatedAt   DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 
   challenge Challenge[]
 }
 
-model StudySerires {
-  id   Int    @id @default(autoincrement())
-  name String
-  description String
-  image_url String?
-  status Int @default(1)
-  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
-  updatedAt   DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
+model StudySeries {
+  id Int @id @default(autoincrement())
 
-  studySeriresChallenge StudySeriresChallenge[]
+  authorId Int
+  user     User @relation(fields: [authorId], references: [id])
+
+  name        String
+  description String
+  image_url   String?
+  status      Int      @default(1)
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+
+  studySeriesChallenge StudySeriesChallenge[]
 }
 
-model StudySeriresChallenge {
-  id          Int       @id @default(autoincrement())
+model StudySeriesChallenge {
   seriesId    Int
-  challengeId      Int
+  challengeId Int
 
-  challenge   Challenge @relation(fields: [challengeId], references: [id])
-  studySeries        StudySerires      @relation(fields: [seriesId], references: [id])
+  challenge   Challenge   @relation(fields: [challengeId], references: [id])
+  studySeries StudySeries @relation(fields: [seriesId], references: [id])
 
-  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
-  updatedAt   DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
+  createdAt DateTime? @default(now()) @db.Timestamptz()
+  updatedAt DateTime? @default(now()) @updatedAt @db.Timestamptz(3)
+
+  @@id(name: "id", fields: [seriesId, challengeId])
 }

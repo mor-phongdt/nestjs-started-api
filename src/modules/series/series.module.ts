@@ -5,7 +5,7 @@ import { PrismaModule } from "src/database/prisma.module";
 import { SeriesService } from "./series.service";
 import { PrismaService } from "src/database/prisma.service";
 import { APP_GUARD } from "@nestjs/core";
-import { AuthGuard } from "../auth/auth.guard";
+import { JwtStrategy } from "../auth/strategies/jwt.strategy";
 import { SeriesController } from "./series.controller";
 
 @Module({
@@ -28,7 +28,7 @@ import { SeriesController } from "./series.controller";
     PrismaService,
     {
       provide: APP_GUARD,
-      useClass: AuthGuard
+      useClass: JwtStrategy
     }
   ],
   controllers: [SeriesController]
