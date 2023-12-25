@@ -92,7 +92,7 @@ model StudySeries {
 
   authorId Int
   user     User @relation(fields: [authorId], references: [id])
-
+  
   name        String
   description String
   image_url   String?
@@ -114,4 +114,14 @@ model StudySeriesChallenge {
   updatedAt DateTime? @default(now()) @updatedAt @db.Timestamptz(3)
 
   @@id([seriesId, challengeId])
+}
+
+model NewWords {
+  id      Int    @id @default(autoincrement())
+  word    String
+  mean    String
+  example String
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 }

@@ -4,6 +4,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/users/user.module';
 import { ChallengeModule } from './modules/challenge/challenge.module';
 import { SeriesModule } from './modules/series/series.module';
+import { WordModule } from './modules/words/word.module';
 import { PrismaModule } from './database/prisma.module';
 
 @Module({
@@ -15,6 +16,7 @@ import { PrismaModule } from './database/prisma.module';
     UserModule,
     ChallengeModule,
     SeriesModule,
+    WordModule,
     PrismaModule,
   ],
   controllers: [],
