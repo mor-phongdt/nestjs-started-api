@@ -27,7 +27,7 @@ model User {
   nickname  String?
   avatarUrl String?
   lastLogin DateTime? @db.Timestamptz(3)
-  position String?
+  position  String?
   theme_ide String?   @default("default")
   createdAt DateTime  @default(now()) @db.Timestamptz(3)
   updatedAt DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
@@ -38,11 +38,11 @@ model User {
 }
 
 model Challenge {
-  id                  Int      @id @default(autoincrement())
+  id                  Int               @id @default(autoincrement())
   title               String
   description         String
   spendTime           Int?
-  userCompleted       Int?     @default(0)
+  userCompleted       Int?              @default(0)
   level               Int?
   authorId            Int
   codeTemplate        Json
@@ -51,10 +51,10 @@ model Challenge {
   solutionDescription String?
   frameworkId         Int
   category            ChallengeCategory @default(value: coding)
-  status              Int      @default(1)
-  type                ChallengeType @default(value: preview)
-  createdAt           DateTime @default(now()) @db.Timestamptz(3)
-  updatedAt           DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+  status              Int               @default(1)
+  type                ChallengeType     @default(value: preview)
+  createdAt           DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt           DateTime          @default(now()) @updatedAt @db.Timestamptz(3)
 
   author               User                   @relation(fields: [authorId], references: [id])
   framework            LanguageFramework      @relation(fields: [frameworkId], references: [id])
@@ -68,11 +68,12 @@ model SubmissionChallenge {
   code        String?
   status      Int       @default(0)
   startTime   DateTime  @db.Timestamptz(3)
-  endTime     DateTime?  @db.Timestamptz(3)
+  endTime     DateTime? @db.Timestamptz(3)
   createdAt   DateTime  @default(now()) @db.Timestamptz(3)
   updatedAt   DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
   challenge   Challenge @relation(fields: [challengeId], references: [id])
   user        User      @relation(fields: [userId], references: [id])
+
   @@id([challengeId, userId])
 }
 
@@ -112,5 +113,5 @@ model StudySeriesChallenge {
   createdAt DateTime? @default(now()) @db.Timestamptz()
   updatedAt DateTime? @default(now()) @updatedAt @db.Timestamptz(3)
 
-  @@id(name: "id", fields: [seriesId, challengeId])
+  @@id([seriesId, challengeId])
 }

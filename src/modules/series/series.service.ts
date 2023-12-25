@@ -1,15 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/database/prisma.service";
-import { Prisma, StudySeries } from "@prisma/client";
-import { SeriesDto } from "./dto/series-dto";
+import { ChallengeCategory, Prisma, StudySeries } from "@prisma/client";
+import { SeriesDto, UpdateSeriesDto } from "./dto/series-dto";
 import { IUser } from "src/types/user/index.type";
-import { pojos, PojosMetadataMap } from "@automapper/pojos";
-import { createMap, createMapper, forMember, mapFrom } from "@automapper/core";
-
 
 enum Tabs {
-  CODING = 'Coding',
-  SYSTEM = 'System design'
+  coding = 'Coding',
+  system_design = 'System design'
 }
 
 // interface
@@ -18,16 +15,15 @@ enum Tabs {
 export class SeriesService {
   constructor(private prisma: PrismaService) { }
 
-
-  async getListChallengeByCategory(tab: string, page: string, limit: string, seriesId: string): Promise<{ data: any }> {
-    const _tab = parseInt(tab)
+  async getListChallengeByCategory(tab: ChallengeCategory, page: string, limit: string, seriesId: string): Promise<{ data: any }> {
+    // const _tab = parseInt(tab)
     const _page = parseInt(page)
     const _limit = parseInt(limit)
 
     try {
       const listChallenge = await this.prisma.challenge.findMany({
         where: {
-          category: _tab,
+          category: tab,
 
         },
         take: _limit,
@@ -36,7 +32,7 @@ export class SeriesService {
       if (listChallenge)
         return {
           data: {
-            title: Object.values(Tabs).find((item, index) => index + 1 === _tab),
+            title: Tabs[tab],
             list: listChallenge
           }
         }
@@ -57,7 +53,7 @@ export class SeriesService {
     }
   }
 
-  async getListChallengeByFrameWork(id: string, tab: string, page: string, limit: string): Promise<{ data: any }> {
+  async getListChallengeByFrameWork(id: string, tab: ChallengeCategory, page: string, limit: string): Promise<{ data: any }> {
     try {
       const _id = parseInt(id)
       const _page = parseInt(page)
@@ -66,7 +62,7 @@ export class SeriesService {
       const listChallenge = await this.prisma.challenge.findMany({
         where: {
           frameworkId: _id,
-          category: _tab
+          category: tab
         },
         take: _limit,
         skip: _limit * _page,
@@ -97,7 +93,7 @@ export class SeriesService {
             ...series,
             tabs: Object.values(tabs).map(value => ({
               id: value.category,
-              name: Object.values(Tabs).find((item, index) => index + 1 === value.category),
+              name: Tabs[tab],
               count: value._count.category
             })),
             listChallenge: listChallenge,
@@ -107,7 +103,6 @@ export class SeriesService {
       throw error
     }
   }
-
   //ignore update series feature
   async updateSeriesChallenge(req: any): Promise<{ message: string }> {
     try {
@@ -121,6 +116,7 @@ export class SeriesService {
 
   async createSeries(seriesData: SeriesDto, user: IUser): Promise<{ message: string }> {
     try {
+      console.log(user)
       const insertSeries = await this.prisma.studySeries.create({
         data: {
           authorId: user.id,
@@ -141,6 +137,46 @@ export class SeriesService {
 
       if (updateChallenges)
         return { message: 'Successfully' }
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async updateSeries(series: UpdateSeriesDto): Promise<{ data: any }> {
+    try {
+      const existingChallenge = await this.prisma.studySeriesChallenge.findMany({
+        where: {
+          seriesId: { in: series.challenges }
+        }
+      })
+
+      const existingChallengeIds = existingChallenge.map(record => record.challengeId)
+      const updateChallengeIds = series.challenges.filter(id => !existingChallengeIds.includes(id))
+
+      updateChallengeIds.map(async (id) => {
+        await this.prisma.studySeriesChallenge.create({
+          data: {
+            seriesId: series.seriesId,
+            challengeId: id
+          }
+        })
+      })
+      return { data: existingChallenge }
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async deleteSeries(id: string, user: IUser): Promise<{ message: string }> {
+    try {
+      const series = await this.prisma.studySeries.delete({
+        where: {
+          id: parseInt(id),
+          authorId: user.id
+        }
+      })
+      if (series)
+        return { message: 'Deleted Successfully' }
     } catch (error) {
       throw error
     }
@@ -170,6 +206,7 @@ export class SeriesService {
     }
   }
 
+
   async getListChallengeBySeries(id: string, page: string, limit: string): Promise<{ data: any }> {
     try {
       const seriesDetail = await this.prisma.studySeries.findUnique({
@@ -180,19 +217,43 @@ export class SeriesService {
           studySeriesChallenge: {
             select: {
               challenge: {
-                equals: {
-                  id: true
+                select: {
+                  id: true,
+                  title: true,
+                  description: true,
+                  spendTime: true,
+                  userCompleted: true,
+                  level: true,
+                  frameworkId: true,
+                  status: true,
+                  updatedAt: true,
+                  category: true
                 }
               }
             },
+            take: parseInt(limit),
+            skip: parseInt(limit) * parseInt(page)
+          },
+        },
+
+      })
+
+      const _studySeriesChallenge = []
+      seriesDetail.studySeriesChallenge.map(item => {
+        _studySeriesChallenge.push(item.challenge)
+      })
+
+      if (seriesDetail)
+        return {
+          data: {
+            detail: {
+              ...seriesDetail, studySeriesChallenge: {
+                coding: _studySeriesChallenge.filter(item => item.category === 'coding'),
+                system: _studySeriesChallenge.filter(item => item.category === 'system_design')
+              }
+            }
           }
         }
-      })
-      const _studySeriesChallenge = seriesDetail.studySeriesChallenge.map(item => {
-        return { ...item.challenge }
-      })
-      if (seriesDetail)
-        return { data: { detail: { ...seriesDetail, studySeriesChallenge: _studySeriesChallenge } } }
     } catch (error) {
       throw error
     }

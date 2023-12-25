@@ -3,7 +3,7 @@ import { ApiProperty } from "@nestjs/swagger";
 export class SeriesDto {
 
  @ApiProperty()
- authorId: number
+ authorId: number;
 
  @ApiProperty()
  name: string;
@@ -18,7 +18,17 @@ export class SeriesDto {
  image_url: string
 
  @ApiProperty()
- listChallenge: number[]
+ listChallenge: Array<number>
+
+}
+
+export class UpdateSeriesDto {
+
+ @ApiProperty()
+ seriesId: number;
+
+ @ApiProperty()
+ challenges: Array<number>
 
 }
 

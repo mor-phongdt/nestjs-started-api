@@ -69,8 +69,9 @@ CREATE TABLE "LanguageFramework" (
 );
 
 -- CreateTable
-CREATE TABLE "StudySerires" (
+CREATE TABLE "StudySeries" (
     "id" SERIAL NOT NULL,
+    "authorId" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "image_url" TEXT,
@@ -78,18 +79,17 @@ CREATE TABLE "StudySerires" (
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "StudySerires_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "StudySeries_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "StudySeriresChallenge" (
-    "id" SERIAL NOT NULL,
+CREATE TABLE "StudySeriesChallenge" (
     "seriesId" INTEGER NOT NULL,
     "challengeId" INTEGER NOT NULL,
-    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "StudySeriresChallenge_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "StudySeriesChallenge_pkey" PRIMARY KEY ("seriesId","challengeId")
 );
 
 -- CreateIndex
@@ -108,7 +108,10 @@ ALTER TABLE "SubmissionChallenge" ADD CONSTRAINT "SubmissionChallenge_challengeI
 ALTER TABLE "SubmissionChallenge" ADD CONSTRAINT "SubmissionChallenge_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "StudySeriresChallenge" ADD CONSTRAINT "StudySeriresChallenge_challengeId_fkey" FOREIGN KEY ("challengeId") REFERENCES "Challenge"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "StudySeries" ADD CONSTRAINT "StudySeries_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "StudySeriresChallenge" ADD CONSTRAINT "StudySeriresChallenge_seriesId_fkey" FOREIGN KEY ("seriesId") REFERENCES "StudySerires"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "StudySeriesChallenge" ADD CONSTRAINT "StudySeriesChallenge_challengeId_fkey" FOREIGN KEY ("challengeId") REFERENCES "Challenge"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "StudySeriesChallenge" ADD CONSTRAINT "StudySeriesChallenge_seriesId_fkey" FOREIGN KEY ("seriesId") REFERENCES "StudySeries"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

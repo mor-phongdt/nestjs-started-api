@@ -1,10 +1,11 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, Put, Post, Query, Redirect, Request, UseGuards, Body } from "@nestjs/common";
+import { Controller, Get, HttpCode, HttpStatus, Param, Put, Post, Query, Redirect, Request, UseGuards, Body, Delete } from "@nestjs/common";
 import { ApiBearerAuth, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { SeriesService } from "./series.service";
-import { SeriesDto } from "./dto/series-dto";
+import { SeriesDto, UpdateSeriesDto } from "./dto/series-dto";
 import { User } from "../users/decorators/user.decorator";
 import { JwtAuthGuard } from "../auth/guards/jwt.guard";
 import { IUser } from "src/types/user/index.type";
+import { ChallengeCategory } from "@prisma/client";
 
 @ApiTags('series')
 @Controller('api/series')
@@ -18,7 +19,7 @@ export class SeriesController {
   })
   @Get('/list?')
   getListCategoryChallenge(
-    @Query('tab') tab: string,
+    @Query('tab') tab: ChallengeCategory,
     @Query('page') page: string,
     @Query('limit') limit: string,
     @Query('series_id') seriesId: string,
@@ -41,7 +42,7 @@ export class SeriesController {
   @Get('/framework?')
   getListChallengeByFrameWork(
     @Query('id') id: string,
-    @Query('tab') tab: string,
+    @Query('tab') tab: ChallengeCategory,
     @Query('page') page: string,
     @Query('limit') limit: string
   ) {
@@ -64,6 +65,20 @@ export class SeriesController {
     return this.seriesService.createSeries(seriesDto, user)
   }
 
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @Put('series/update')
+  updateSeries(@Body() series: UpdateSeriesDto) {
+    return this.seriesService.updateSeries(series)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @Delete('/series/:id')
+  deleteService(@Param('id') id: string, @User() user: IUser) {
+    return this.seriesService.deleteSeries(id, user)
+  }
+
   @HttpCode(HttpStatus.OK)
   @Get('/series/list?')
   getAllSeries(
@@ -77,7 +92,6 @@ export class SeriesController {
   @Get('/series/detail?')
   getListChallengeBySeries(
     @Query('id') seriesId: string,
-    @Query('tab') tab: string,
     @Query('page') page: string,
     @Query('limit') limit: string
   ) {
