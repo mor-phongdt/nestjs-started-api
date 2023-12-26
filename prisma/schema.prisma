@@ -34,6 +34,7 @@ model User {
 
   challenges          Challenge[]
   submissionChallenge SubmissionChallenge[]
+  StudySeries         StudySeries[]
 }
 
 model Challenge {
@@ -55,10 +56,10 @@ model Challenge {
   createdAt           DateTime          @default(now()) @db.Timestamptz(3)
   updatedAt           DateTime          @default(now()) @updatedAt @db.Timestamptz(3)
 
-  author                User                    @relation(fields: [authorId], references: [id])
-  framework             LanguageFramework       @relation(fields: [frameworkId], references: [id])
-  submissionChallenge   SubmissionChallenge[]
-  studySeriresChallenge StudySeriresChallenge[]
+  author               User                   @relation(fields: [authorId], references: [id])
+  framework            LanguageFramework      @relation(fields: [frameworkId], references: [id])
+  submissionChallenge  SubmissionChallenge[]
+  studySeriesChallenge StudySeriesChallenge[]
 }
 
 model SubmissionChallenge {
@@ -86,8 +87,12 @@ model LanguageFramework {
   challenge Challenge[]
 }
 
-model StudySerires {
-  id          Int      @id @default(autoincrement())
+model StudySeries {
+  id Int @id @default(autoincrement())
+
+  authorId Int
+  user     User @relation(fields: [authorId], references: [id])
+  
   name        String
   description String
   image_url   String?
@@ -95,19 +100,20 @@ model StudySerires {
   createdAt   DateTime @default(now()) @db.Timestamptz(3)
   updatedAt   DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 
-  studySeriresChallenge StudySeriresChallenge[]
+  studySeriesChallenge StudySeriesChallenge[]
 }
 
-model StudySeriresChallenge {
-  id          Int @id @default(autoincrement())
+model StudySeriesChallenge {
   seriesId    Int
   challengeId Int
 
-  challenge   Challenge    @relation(fields: [challengeId], references: [id])
-  studySeries StudySerires @relation(fields: [seriesId], references: [id])
+  challenge   Challenge   @relation(fields: [challengeId], references: [id])
+  studySeries StudySeries @relation(fields: [seriesId], references: [id])
 
-  createdAt DateTime @default(now()) @db.Timestamptz(3)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+  createdAt DateTime? @default(now()) @db.Timestamptz()
+  updatedAt DateTime? @default(now()) @updatedAt @db.Timestamptz(3)
+
+  @@id([seriesId, challengeId])
 }
 
 model NewWords {
