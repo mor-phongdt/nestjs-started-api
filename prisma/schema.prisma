@@ -111,10 +111,10 @@ model StudySeriresChallenge {
 }
 
 model NewWords {
-  id      Int    @id @default(autoincrement())
-  word    String
-  mean    String
-  example String
+  id         Int    @id @default(autoincrement())
+  word       String @unique
+  definition Json
+  example    String
 
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
