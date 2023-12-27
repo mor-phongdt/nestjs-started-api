@@ -1,159 +1,107 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/database/prisma.service";
 import { ChallengeCategory, Prisma, StudySeries } from "@prisma/client";
-import { SeriesDto, UpdateSeriesDto } from "./dto/series-dto";
+import { PaginationQueryParams, SeriesDto, StudySeriesChallengeDto } from "./dto/series-dto";
 import { IUser } from "src/types/user/index.type";
+import { IQueryParams, ISeriesCreateRequest } from "src/types/series/index.type";
 
-enum Tabs {
-  coding = 'Coding',
-  system_design = 'System design'
-}
-
-// interface
 
 @Injectable()
 export class SeriesService {
   constructor(private prisma: PrismaService) { }
 
-  async getListChallengeByCategory(tab: ChallengeCategory, page: string, limit: string, seriesId: string): Promise<{ data: any }> {
-    // const _tab = parseInt(tab)
-    const _page = parseInt(page)
-    const _limit = parseInt(limit)
-
+  async createSeries(seriesData: ISeriesCreateRequest, listChallenge: Array<number>): Promise<{ message: string }> {
     try {
-      const listChallenge = await this.prisma.challenge.findMany({
-        where: {
-          category: tab,
-
-        },
-        take: _limit,
-        skip: _limit * _page
-      })
-      if (listChallenge)
-        return {
-          data: {
-            title: Tabs[tab],
-            list: listChallenge
+      const [users, series] = await this.prisma.$transaction([
+        this.prisma.challenge.findMany({
+          where: {
+            id: { in: listChallenge }
+          },
+          select: {
+            authorId: true
           }
-        }
-    } catch (error) {
-      throw error
-    }
-  }
-
-  async getListFrameWork(): Promise<{ data: any }> {
-    try {
-      const listFrameWork = await this.prisma.languageFramework.findMany()
-      if (listFrameWork)
-        return {
-          data: listFrameWork
-        }
-    } catch (error) {
-      throw error
-    }
-  }
-
-  async getListChallengeByFrameWork(id: string, tab: ChallengeCategory, page: string, limit: string): Promise<{ data: any }> {
-    try {
-      const _id = parseInt(id)
-      const _page = parseInt(page)
-      const _limit = parseInt(limit)
-      const _tab = parseInt(tab)
-      const listChallenge = await this.prisma.challenge.findMany({
-        where: {
-          frameworkId: _id,
-          category: tab
-        },
-        take: _limit,
-        skip: _limit * _page,
-
-      })
-      const series = await this.prisma.languageFramework.findUnique({
-        where: {
-          id: _id
-        },
-        select: {
-          id: true,
-          name: true,
-          imageUrl: true
-        }
-      })
-      const tabs = await this.prisma.challenge.groupBy({
-        by: ['category'],
-        _count: {
-          category: true
-        },
-        orderBy: {
-          category: 'asc'
-        }
-      })
-      if (listChallenge)
-        return {
+        }),
+        this.prisma.studySeries.create({
           data: {
-            ...series,
-            tabs: Object.values(tabs).map(value => ({
-              id: value.category,
-              name: Tabs[tab],
-              count: value._count.category
-            })),
-            listChallenge: listChallenge,
+            ...seriesData,
+
+          },
+        }),
+
+      ])
+
+      const [updateChallenges, challenges] = await this.prisma.$transaction([
+        this.prisma.studySeriesChallenge.createMany({
+          data: listChallenge.map(id => ({
+            seriesId: series.id,
+            challengeId: Number(id)
+          })),
+          skipDuplicates: true
+        }),
+        this.prisma.studySeriesChallenge.findMany({
+          where: {
+            seriesId: series.id
+          },
+          include: {
+            challenge: {
+              select: {
+                spendTime: true
+              }
+            }
           }
-        }
-    } catch (error) {
-      throw error
-    }
-  }
-  //ignore update series feature
-  async updateSeriesChallenge(req: any): Promise<{ message: string }> {
-    try {
-      const seriesSelectedList = this.prisma.challenge
-      return { message: 'Successfully' }
-    } catch (error) {
+        })
+      ])
 
-      throw error
-    }
-  }
-
-  async createSeries(seriesData: SeriesDto, user: IUser): Promise<{ message: string }> {
-    try {
-      console.log(user)
-      const insertSeries = await this.prisma.studySeries.create({
+      const updateSeries = await this.prisma.studySeries.update({
+        where: {
+          id: series.id
+        },
         data: {
-          authorId: user.id,
-          name: seriesData.name,
-          description: seriesData.description,
-          status: seriesData.status,
-          image_url: seriesData.image_url
-        },
+          totalTime: challenges.map(item => item.challenge.spendTime).reduce((acc, curr) => acc + curr, 0)
+        }
       })
 
-      const updateChallenges = await this.prisma.studySeriesChallenge.createMany({
-        data: seriesData.listChallenge?.map(id => ({
-          seriesId: insertSeries.id,
-          challengeId: Number(id)
-        })),
-        skipDuplicates: true
+      users.map(async (item) => {
+        await this.prisma.seriesUser.create({
+          data: {
+            seriesId: series.id,
+            authorId: item.authorId
+          }
+        })
       })
 
-      if (updateChallenges)
+      if (updateSeries && updateChallenges)
         return { message: 'Successfully' }
     } catch (error) {
       throw error
     }
   }
 
-  async updateSeries(series: UpdateSeriesDto): Promise<{ data: any }> {
+  // Update title, description,level, spend time...
+  async updateSeries(): Promise<{ message: string }> {
     try {
-      const existingChallenge = await this.prisma.studySeriesChallenge.findMany({
+      return { message: 'hihi' }
+    } catch (error) {
+
+    }
+  }
+
+  async updateSeriesChallenge(series: StudySeriesChallengeDto): Promise<{ data: any }> {
+    try {
+
+      const updateSeries = await this.prisma.studySeries.update({
         where: {
-          seriesId: { in: series.challenges }
+          id: series.seriesId
+        },
+        data: {
+          name: series.name,
+          description: series.description,
+          status: series.status,
+          image_url: series.image_url,
         }
       })
 
-      const existingChallengeIds = existingChallenge.map(record => record.challengeId)
-      const updateChallengeIds = series.challenges.filter(id => !existingChallengeIds.includes(id))
-
-      updateChallengeIds.map(async (id) => {
+      series.listChallenge.map(async (id) => {
         await this.prisma.studySeriesChallenge.create({
           data: {
             seriesId: series.seriesId,
@@ -161,7 +109,7 @@ export class SeriesService {
           }
         })
       })
-      return { data: existingChallenge }
+      return { data: [] }
     } catch (error) {
       throw error
     }
@@ -182,36 +130,82 @@ export class SeriesService {
     }
   }
 
-  async getAllSeries(page: string, limit: string): Promise<{ data: any }> {
+  //Delete challenge in series
+  async deleteChallengeFromSeries(): Promise<{ message: string }> {
     try {
-      const _limit = parseInt(limit)
-      const _page = parseInt(page)
-      const listSeries = await this.prisma.studySeries.findMany({
-        select: {
-          id: true,
-          authorId: true,
-          name: true,
-          description: true,
-          image_url: true,
-          status: true,
-          updatedAt: true
-        },
-        take: _limit,
-        skip: _limit * _page
-      })
-      if (listSeries)
-        return { data: listSeries }
+      return { message: 'hihi' }
+    } catch (error) {
+
+    }
+  }
+
+  async getAllSeries(query: PaginationQueryParams): Promise<{ data: any }> {
+    try {
+      const _limit = parseInt(query.limit)
+      const _page = parseInt(query.page)
+
+      const [series, totalRecord] = await this.prisma.$transaction([
+        this.prisma.studySeries.findMany({
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            image_url: true,
+            status: true,
+            updatedAt: true,
+            _count: {
+              select: {
+                studySeriesChallenge: true
+              }
+            },
+            contributors: {
+              select: {
+                user: {
+                  select:
+                  {
+                    id: true,
+                    nickname: true,
+                    avatarUrl: true
+                  }
+                }
+              }
+            },
+          },
+          take: _limit,
+          skip: _limit * _page
+        }),
+        this.prisma.studySeries.count()
+      ])
+
+      const flattenedListSeries = series.map(({ _count, contributors, ...item }) => ({
+        ...item,
+        challenges: _count.studySeriesChallenge,
+        contributors: contributors.map(user => user.user),
+      }))
+      if (series)
+        return {
+          data:
+          {
+            series: flattenedListSeries,
+            meta: {
+              total: series.length,
+              page: _page,
+              limit: _limit,
+              totalPages: Math.ceil(totalRecord / _limit)
+            }
+          }
+        }
     } catch (error) {
       throw error
     }
   }
 
 
-  async getListChallengeBySeries(id: string, page: string, limit: string): Promise<{ data: any }> {
+  async getListChallengeBySeries(query: IQueryParams): Promise<{ data: any }> {
     try {
       const seriesDetail = await this.prisma.studySeries.findUnique({
         where: {
-          id: parseInt(id),
+          id: parseInt(query.id),
         },
         include: {
           studySeriesChallenge: {
@@ -231,8 +225,8 @@ export class SeriesService {
                 }
               }
             },
-            take: parseInt(limit),
-            skip: parseInt(limit) * parseInt(page)
+            take: parseInt(query.limit),
+            skip: parseInt(query.limit) * parseInt(query.page)
           },
         },
 
@@ -248,8 +242,8 @@ export class SeriesService {
           data: {
             detail: {
               ...seriesDetail, studySeriesChallenge: {
-                coding: _studySeriesChallenge.filter(item => item.category === 'coding'),
-                system: _studySeriesChallenge.filter(item => item.category === 'system_design')
+                coding: _studySeriesChallenge.filter(item => item.category === 'coding' && query.tab === 'coding'),
+                system: _studySeriesChallenge.filter(item => item.category === 'system_design' && query.tab === 'system_design')
               }
             }
           }
