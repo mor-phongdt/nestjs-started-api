@@ -7,6 +7,7 @@ import {
   UseGuards,
   Get,
   Req,
+  Res,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -21,7 +22,7 @@ import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { Public } from './decorators/public.decorator';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import { GoogleAuthGuard } from './guards/google.guard';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { GithubAuthGuard } from './guards/github.guard';
 @ApiTags('auth')
 @Controller('api/auth')
@@ -80,8 +81,11 @@ export class AuthController {
   @ApiExcludeEndpoint()
   @UseGuards(GoogleAuthGuard)
   @Get('/google/redirect')
-  googleCallback(@Req() req: Request) {
-    return this.authService.loginSocial(req);
+  async googleCallback(@Req() req: Request, @Res() res: Response) {
+    const { access_token } = await this.authService.loginSocial(req);
+    res.redirect(
+      `${process.env.FE_URL}/oauth-success-redirect/${access_token}`,
+    );
   }
 
   @ApiOAuth2(['profile', 'email'])
@@ -94,7 +98,10 @@ export class AuthController {
   @ApiExcludeEndpoint()
   @UseGuards(GithubAuthGuard)
   @Get('/github/callback')
-  githubCallback(@Req() req: Request) {
-    return this.authService.loginSocial(req);
+  async githubCallback(@Req() req: Request, @Res() res: Response) {
+    const { access_token } = await this.authService.loginSocial(req);
+    res.redirect(
+      `${process.env.FE_URL}/oauth-success-redirect/${access_token}`,
+    );
   }
 }
