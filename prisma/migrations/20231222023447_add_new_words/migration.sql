@@ -1,0 +1,11 @@
+-- CreateTable
+CREATE TABLE "NewWords" (
+    "id" SERIAL NOT NULL,
+    "word" TEXT NOT NULL,
+    "mean" TEXT NOT NULL,
+    "example" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "NewWords_pkey" PRIMARY KEY ("id")
+);

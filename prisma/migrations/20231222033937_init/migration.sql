@@ -1,3 +1,9 @@
+-- CreateEnum
+CREATE TYPE "ChallengeType" AS ENUM ('preview', 'console');
+
+-- CreateEnum
+CREATE TYPE "ChallengeCategory" AS ENUM ('coding', 'system_design');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
@@ -6,6 +12,7 @@ CREATE TABLE "User" (
     "nickname" TEXT,
     "avatarUrl" TEXT,
     "lastLogin" TIMESTAMPTZ(3),
+    "position" TEXT,
     "theme_ide" TEXT DEFAULT 'default',
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -27,9 +34,9 @@ CREATE TABLE "Challenge" (
     "codeTest" JSONB NOT NULL,
     "solutionDescription" TEXT,
     "frameworkId" INTEGER NOT NULL,
-    "category" INTEGER NOT NULL,
+    "category" "ChallengeCategory" NOT NULL DEFAULT 'coding',
     "status" INTEGER NOT NULL DEFAULT 1,
-    "type" INTEGER NOT NULL,
+    "type" "ChallengeType" NOT NULL DEFAULT 'preview',
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -38,17 +45,16 @@ CREATE TABLE "Challenge" (
 
 -- CreateTable
 CREATE TABLE "SubmissionChallenge" (
-    "id" SERIAL NOT NULL,
     "challengeId" INTEGER NOT NULL,
     "userId" INTEGER NOT NULL,
-    "code" TEXT NOT NULL,
+    "code" TEXT,
     "status" INTEGER NOT NULL DEFAULT 0,
     "startTime" TIMESTAMPTZ(3) NOT NULL,
-    "endTime" TIMESTAMPTZ(3) NOT NULL,
+    "endTime" TIMESTAMPTZ(3),
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "SubmissionChallenge_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "SubmissionChallenge_pkey" PRIMARY KEY ("challengeId","userId")
 );
 
 -- CreateTable
@@ -63,8 +69,9 @@ CREATE TABLE "LanguageFramework" (
 );
 
 -- CreateTable
-CREATE TABLE "StudySerires" (
+CREATE TABLE "StudySeries" (
     "id" SERIAL NOT NULL,
+    "authorId" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "image_url" TEXT,
@@ -72,18 +79,17 @@ CREATE TABLE "StudySerires" (
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "StudySerires_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "StudySeries_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "StudySeriresChallenge" (
-    "id" SERIAL NOT NULL,
+CREATE TABLE "StudySeriesChallenge" (
     "seriesId" INTEGER NOT NULL,
     "challengeId" INTEGER NOT NULL,
-    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "StudySeriresChallenge_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "StudySeriesChallenge_pkey" PRIMARY KEY ("seriesId","challengeId")
 );
 
 -- CreateIndex
@@ -102,7 +108,10 @@ ALTER TABLE "SubmissionChallenge" ADD CONSTRAINT "SubmissionChallenge_challengeI
 ALTER TABLE "SubmissionChallenge" ADD CONSTRAINT "SubmissionChallenge_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "StudySeriresChallenge" ADD CONSTRAINT "StudySeriresChallenge_challengeId_fkey" FOREIGN KEY ("challengeId") REFERENCES "Challenge"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "StudySeries" ADD CONSTRAINT "StudySeries_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "StudySeriresChallenge" ADD CONSTRAINT "StudySeriresChallenge_seriesId_fkey" FOREIGN KEY ("seriesId") REFERENCES "StudySerires"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "StudySeriesChallenge" ADD CONSTRAINT "StudySeriesChallenge_challengeId_fkey" FOREIGN KEY ("challengeId") REFERENCES "Challenge"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "StudySeriesChallenge" ADD CONSTRAINT "StudySeriesChallenge_seriesId_fkey" FOREIGN KEY ("seriesId") REFERENCES "StudySeries"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

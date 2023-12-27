@@ -24,6 +24,17 @@ export class UserService {
         where: {
           id: Number(id),
         },
+        select: {
+          id: true,
+          email: true,
+          nickname: true,
+          avatarUrl: true,
+          theme_ide: true,
+          position: true,
+          lastLogin: true,
+          updatedAt: true,
+          createdAt: true,
+        },
       });
 
       if (!user) {
@@ -80,6 +91,17 @@ export class UserService {
       const user = await this.prisma.user.findUnique({
         where: {
           id: Number(id),
+        },
+        select: {
+          id: true,
+          email: true,
+          nickname: true,
+          avatarUrl: true,
+          theme_ide: true,
+          position: true,
+          lastLogin: true,
+          updatedAt: true,
+          createdAt: true,
         },
       });
 
