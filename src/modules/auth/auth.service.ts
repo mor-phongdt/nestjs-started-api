@@ -126,7 +126,7 @@ export class AuthService {
     try {
       const reqUser: any = req.user;
       const { email, firstName, lastName, picture } = reqUser;
-      const nickname = firstName + ' ' + lastName;
+      const nickname = lastName ? firstName + ' ' + lastName : firstName;
       const avatarUrl = picture;
       const user = await this.prisma.user.findUnique({
         where: {
