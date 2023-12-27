@@ -12,7 +12,14 @@ export class SeriesService {
 
   async createSeries(seriesData: ISeriesCreateRequest, listChallenge: Array<number>): Promise<{ message: string }> {
     try {
-      const [users, series] = await this.prisma.$transaction([
+
+      const series = await this.prisma.studySeries.create({
+        data: {
+          ...seriesData,
+        },
+      })
+
+      const users = await
         this.prisma.challenge.findMany({
           where: {
             id: { in: listChallenge }
@@ -20,37 +27,28 @@ export class SeriesService {
           select: {
             authorId: true
           }
-        }),
-        this.prisma.studySeries.create({
-          data: {
-            ...seriesData,
+        })
 
-          },
-        }),
+      const updateChallenges = await this.prisma.studySeriesChallenge.createMany({
+        data: listChallenge.map(id => ({
+          seriesId: series.id,
+          challengeId: Number(id)
+        })),
+        skipDuplicates: true
+      })
 
-      ])
-
-      const [updateChallenges, challenges] = await this.prisma.$transaction([
-        this.prisma.studySeriesChallenge.createMany({
-          data: listChallenge.map(id => ({
-            seriesId: series.id,
-            challengeId: Number(id)
-          })),
-          skipDuplicates: true
-        }),
-        this.prisma.studySeriesChallenge.findMany({
-          where: {
-            seriesId: series.id
-          },
-          include: {
-            challenge: {
-              select: {
-                spendTime: true
-              }
+      const challenges = await this.prisma.studySeriesChallenge.findMany({
+        where: {
+          seriesId: series.id
+        },
+        include: {
+          challenge: {
+            select: {
+              spendTime: true
             }
           }
-        })
-      ])
+        }
+      })
 
       const updateSeries = await this.prisma.studySeries.update({
         where: {
@@ -144,38 +142,37 @@ export class SeriesService {
       const _limit = parseInt(query.limit)
       const _page = parseInt(query.page)
 
-      const [series, totalRecord] = await this.prisma.$transaction([
-        this.prisma.studySeries.findMany({
-          select: {
-            id: true,
-            name: true,
-            description: true,
-            image_url: true,
-            status: true,
-            updatedAt: true,
-            _count: {
-              select: {
-                studySeriesChallenge: true
-              }
-            },
-            contributors: {
-              select: {
-                user: {
-                  select:
-                  {
-                    id: true,
-                    nickname: true,
-                    avatarUrl: true
-                  }
-                }
-              }
+      const series = await this.prisma.studySeries.findMany({
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          image_url: true,
+          status: true,
+          updatedAt: true,
+          _count: {
+            select: {
+              studySeriesChallenge: true,
             },
           },
-          take: _limit,
-          skip: _limit * _page
-        }),
-        this.prisma.studySeries.count()
-      ])
+          contributors: {
+            select: {
+              user: {
+                select:
+                {
+                  id: true,
+                  nickname: true,
+                  avatarUrl: true
+                }
+              }
+            }
+          },
+        },
+        take: _limit,
+        skip: _limit * _page
+      })
+
+      const totalRecord = await this.prisma.studySeries.count()
 
       const flattenedListSeries = series.map(({ _count, contributors, ...item }) => ({
         ...item,
