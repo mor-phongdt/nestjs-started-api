@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 @Injectable()
 export class UserService {
@@ -8,9 +12,9 @@ export class UserService {
     try {
       const data = await this.prisma.user.findMany();
 
-      return { data: data };
+      return { statusCode: '200', data: data };
     } catch (error) {
-      return { status: error.code, message: error.message };
+      throw error;
     }
   }
 
@@ -37,9 +41,9 @@ export class UserService {
         throw new NotFoundException();
       }
 
-      return { data: user };
+      return { statusCode: '200', data: user };
     } catch (error) {
-      return { status: error.code, message: error.message };
+      throw error;
     }
   }
 
@@ -105,9 +109,19 @@ export class UserService {
         throw new NotFoundException();
       }
 
-      return { message: 'deleted successfully' };
+      const deleteUser = await this.prisma.user.delete({
+        where: {
+          id: Number(id),
+        },
+      });
+
+      if (!deleteUser) {
+        throw new InternalServerErrorException();
+      }
+
+      return { statusCode: '200', message: 'deleted successfully' };
     } catch (error) {
-      return { status: error.code, message: error.message };
+      throw error;
     }
   }
 }

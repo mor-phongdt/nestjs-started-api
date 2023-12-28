@@ -4,11 +4,13 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
   NotFoundException,
+  HttpException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/database/prisma.service';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -24,7 +26,7 @@ export class AuthService {
 
     try {
       await this.prisma.user.create({ data });
-      return { message: 'success' };
+      return { statusCode: '200', message: 'success' };
     } catch (error) {
       if (error.code === 'P2002') {
         throw new ConflictException('Email already exists');
@@ -49,14 +51,17 @@ export class AuthService {
             id: user.id,
             email: user.email,
           });
-          return { access_token };
+          return { statusCode: '200', access_token };
         }
       } else {
         throw new UnauthorizedException();
       }
     } catch (error) {
       if (error) {
-        throw error;
+        throw new HttpException(
+          error.message,
+          error.code ? error.code : error.status,
+        );
       } else {
         throw new InternalServerErrorException();
       }
@@ -111,9 +116,41 @@ export class AuthService {
           password,
         },
       });
-      return { message: 'Reset password successfully.' };
+      return { statusCode: '200', message: 'Reset password successfully.' };
     } catch (error) {
-      return { status: error.code, message: error.message };
+      throw error;
+    }
+  }
+
+  async loginSocial(req: Request): Promise<any> {
+    try {
+      const reqUser: any = req.user;
+      const { email, firstName, lastName, picture } = reqUser;
+      const nickname = lastName ? firstName + ' ' + lastName : firstName;
+      const avatarUrl = picture;
+      const user = await this.prisma.user.findUnique({
+        where: {
+          email,
+        },
+      });
+      if (!user) {
+        const newUser = await this.prisma.user.create({
+          data: {
+            email,
+            nickname,
+            avatarUrl,
+            password: '',
+          },
+        });
+
+        const access_token = await this.handleLogin({ id: newUser.id, email });
+        return { statusCode: '200', access_token };
+      } else {
+        const access_token = await this.handleLogin({ id: user.id, email });
+        return { statusCode: '200', access_token };
+      }
+    } catch (error) {
+      throw error;
     }
   }
 }
