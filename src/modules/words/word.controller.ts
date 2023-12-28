@@ -31,7 +31,10 @@ export class WordController {
   })
   @Post('/create')
   createNewWord(@Body() newWordsDto: NewWordsDto) {
-    return this.wordService.createNewWord(newWordsDto);
+    return this.wordService.createNewWord({
+      ...newWordsDto,
+      definition: JSON.stringify(newWordsDto.definition),
+    });
   }
 
   @ApiResponse({

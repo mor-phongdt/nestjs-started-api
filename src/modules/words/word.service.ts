@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { Prisma } from '@prisma/client';
 
@@ -25,7 +30,11 @@ export class WordService {
       });
       if (upsertWord) return { message: 'success' };
     } catch (error) {
-      throw error;
+      if (error.code === 'P2002') {
+        throw new ConflictException('Word already exists');
+      } else {
+        throw new InternalServerErrorException();
+      }
     }
   }
 
@@ -49,7 +58,7 @@ export class WordService {
 
   async deleteWord(id: number): Promise<any> {
     try {
-      const word = await this.prisma.newWords.findUnique({
+      const word = await this.prisma.newWords.delete({
         where: {
           id: Number(id),
         },
