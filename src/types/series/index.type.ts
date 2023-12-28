@@ -4,7 +4,11 @@ export interface IQueryParams extends PaginationQueryParams {
  id: string
 }
 
-export interface ISeriesCreateRequest extends Omit<SeriesDto, 'listChallenge'> {
+export interface ISeriesRequest extends Omit<SeriesDto, 'listChallenge'> {
+ authorId: number
+}
+
+export interface ISeriesUpdate extends SeriesDto {
  authorId: number
 }
 
