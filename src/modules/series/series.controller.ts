@@ -6,6 +6,7 @@ import { User } from "../users/decorators/user.decorator";
 import { JwtAuthGuard } from "../auth/guards/jwt.guard";
 import { IUser } from "src/types/user/index.type";
 import { ChallengeCategory } from "@prisma/client";
+import { ISeriesRequest, ISeriesUpdate } from "src/types/series/index.type";
 
 @ApiTags('series')
 @Controller('api/series')
@@ -29,18 +30,16 @@ export class SeriesController {
     }, seriesDto.listChallenge)
   }
 
-  @HttpCode(HttpStatus.OK)
-  @Put('/update')
-  updateSeries() {
-
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @HttpCode(HttpStatus.OK)
-  @Put('/challenge/update')
-  updateSeriesChallenge(@Body() series: StudySeriesChallengeDto) {
-    return this.seriesService.updateSeriesChallenge(series)
-  }
+  // @UseGuards(JwtAuthGuard)
+  // @HttpCode(HttpStatus.OK)
+  // @Put('/update/:id')
+  // updateSeries(
+  //   @Param('id') id: string,
+  //   @Body() series: ISeriesUpdate,
+  //   @User() user: IUser
+  // ) {
+  //   return this.seriesService.updateSeries(series, user, id)
+  // }
 
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
@@ -61,14 +60,4 @@ export class SeriesController {
     return this.seriesService.getAllSeries({ limit, page })
   }
 
-  @HttpCode(HttpStatus.OK)
-  @Get('/detail?')
-  getListChallengeBySeries(
-    @Query('id') id: string,
-    @Query('page') page: string,
-    @Query('limit') limit: string,
-    @Query('tab') tab?: ChallengeCategory,
-  ) {
-    return this.seriesService.getListChallengeBySeries({ id, limit, page, tab })
-  }
 }

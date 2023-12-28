@@ -1,16 +1,16 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { PrismaService } from "src/database/prisma.service";
 import { ChallengeCategory, Prisma, StudySeries } from "@prisma/client";
 import { PaginationQueryParams, SeriesDto, StudySeriesChallengeDto } from "./dto/series-dto";
 import { IUser } from "src/types/user/index.type";
-import { IQueryParams, ISeriesCreateRequest } from "src/types/series/index.type";
+import { IQueryParams, ISeriesRequest, ISeriesUpdate } from "src/types/series/index.type";
 
 
 @Injectable()
 export class SeriesService {
   constructor(private prisma: PrismaService) { }
 
-  async createSeries(seriesData: ISeriesCreateRequest, listChallenge: Array<number>): Promise<{ message: string }> {
+  async createSeries(seriesData: ISeriesRequest, listChallenge: Array<number>): Promise<{ message: string }> {
     try {
 
       const series = await this.prisma.studySeries.create({
@@ -75,43 +75,37 @@ export class SeriesService {
     }
   }
 
-  // Update title, description,level, spend time...
-  async updateSeries(): Promise<{ message: string }> {
-    try {
-      return { message: 'hihi' }
-    } catch (error) {
+  // async updateSeries(series: ISeriesUpdate, user: IUser, id: string): Promise<{ message: string }> {
+  //   try {
+  //     const _id = parseInt(id)
+  //     const currSeries = await this.prisma.studySeries.findUnique({
+  //       where: {
+  //         id: _id
+  //       }
+  //     })
 
-    }
-  }
+  //     if (currSeries) {
+  //       if (user.id !== currSeries.authorId) {
+  //         throw new UnauthorizedException('You do not have permission to edit')
+  //       }
+  //     }
+  //     else {
+  //       throw new NotFoundException('Not found!')
+  //     }
 
-  async updateSeriesChallenge(series: StudySeriesChallengeDto): Promise<{ data: any }> {
-    try {
+  //     const upsertSeries = await this.prisma.studySeries.update({
+  //       where: {
+  //         id: parseInt(id)
+  //       },
+  //       data: {
+  //         ...series
+  //       }
+  //     })
+  //     return { message: 'hihi' }
+  //   } catch (error) {
 
-      const updateSeries = await this.prisma.studySeries.update({
-        where: {
-          id: series.seriesId
-        },
-        data: {
-          name: series.name,
-          description: series.description,
-          status: series.status,
-          image_url: series.image_url,
-        }
-      })
-
-      series.listChallenge.map(async (id) => {
-        await this.prisma.studySeriesChallenge.create({
-          data: {
-            seriesId: series.seriesId,
-            challengeId: id
-          }
-        })
-      })
-      return { data: [] }
-    } catch (error) {
-      throw error
-    }
-  }
+  //   }
+  // }
 
   async deleteSeries(id: string, user: IUser): Promise<{ message: string }> {
     try {
@@ -125,15 +119,6 @@ export class SeriesService {
         return { message: 'Deleted Successfully' }
     } catch (error) {
       throw error
-    }
-  }
-
-  //Delete challenge in series
-  async deleteChallengeFromSeries(): Promise<{ message: string }> {
-    try {
-      return { message: 'hihi' }
-    } catch (error) {
-
     }
   }
 
@@ -172,13 +157,18 @@ export class SeriesService {
         skip: _limit * _page
       })
 
-      const totalRecord = await this.prisma.studySeries.count()
+      const totalRecord = await this.prisma.studySeries.count({
+        select: {
+          _all: true
+        }
+      })
 
       const flattenedListSeries = series.map(({ _count, contributors, ...item }) => ({
         ...item,
         challenges: _count.studySeriesChallenge,
         contributors: contributors.map(user => user.user),
       }))
+
       if (series)
         return {
           data:
@@ -188,7 +178,7 @@ export class SeriesService {
               total: series.length,
               page: _page,
               limit: _limit,
-              totalPages: Math.ceil(totalRecord / _limit)
+              totalPages: Math.ceil(totalRecord._all / _limit)
             }
           }
         }
@@ -197,56 +187,4 @@ export class SeriesService {
     }
   }
 
-
-  async getListChallengeBySeries(query: IQueryParams): Promise<{ data: any }> {
-    try {
-      const seriesDetail = await this.prisma.studySeries.findUnique({
-        where: {
-          id: parseInt(query.id),
-        },
-        include: {
-          studySeriesChallenge: {
-            select: {
-              challenge: {
-                select: {
-                  id: true,
-                  title: true,
-                  description: true,
-                  spendTime: true,
-                  userCompleted: true,
-                  level: true,
-                  frameworkId: true,
-                  status: true,
-                  updatedAt: true,
-                  category: true
-                }
-              }
-            },
-            take: parseInt(query.limit),
-            skip: parseInt(query.limit) * parseInt(query.page)
-          },
-        },
-
-      })
-
-      const _studySeriesChallenge = []
-      seriesDetail.studySeriesChallenge.map(item => {
-        _studySeriesChallenge.push(item.challenge)
-      })
-
-      if (seriesDetail)
-        return {
-          data: {
-            detail: {
-              ...seriesDetail, studySeriesChallenge: {
-                coding: _studySeriesChallenge.filter(item => item.category === 'coding' && query.tab === 'coding'),
-                system: _studySeriesChallenge.filter(item => item.category === 'system_design' && query.tab === 'system_design')
-              }
-            }
-          }
-        }
-    } catch (error) {
-      throw error
-    }
-  }
 }
