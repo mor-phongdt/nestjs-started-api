@@ -11,11 +11,42 @@ import { Prisma } from '@prisma/client';
 export class WordService {
   constructor(private prisma: PrismaService) {}
 
-  async getWords(): Promise<any> {
+  async getWords(q: string, page: string, limit: string): Promise<any> {
     try {
-      const data = await this.prisma.newWords.findMany();
-
-      return { data: data };
+      const args = {
+        where: {},
+        take: 0,
+        skip: 0,
+      };
+      page
+        ? (args.skip = parseInt(limit) * (parseInt(page) - 1))
+        : delete args.skip;
+      limit ? (args.take = parseInt(limit)) : delete args.take;
+      q
+        ? (args.where = {
+            word: {
+              contains: q,
+            },
+          })
+        : delete args.where;
+      // const data = await this.prisma.newWords.findMany(args);
+      const [data, count] = await this.prisma.$transaction([
+        this.prisma.newWords.findMany(args),
+        this.prisma.newWords.count(),
+      ]);
+      const convertData = data.map((obj) => {
+        if (typeof obj.definition === 'string') {
+          obj.definition = JSON.parse(obj.definition);
+        }
+        return obj;
+      });
+      const meta = {
+        total: count,
+        page: page ? parseInt(page) : 1,
+        limit: limit ? parseInt(limit) : count,
+        totalPages: limit ? Math.ceil(count / parseInt(limit)) : 1,
+      };
+      return { data: { data: convertData, meta: meta } };
     } catch (error) {
       return { status: error.code, message: error.message };
     }
