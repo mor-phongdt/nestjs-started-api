@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/users/user.module';
@@ -6,6 +6,7 @@ import { ChallengeModule } from './modules/challenge/challenge.module';
 import { SeriesModule } from './modules/series/series.module';
 import { WordModule } from './modules/words/word.module';
 import { PrismaModule } from './database/prisma.module';
+import LogsMiddleware from './utils/logs.middleware';
 
 @Module({
   imports: [
@@ -22,4 +23,8 @@ import { PrismaModule } from './database/prisma.module';
   controllers: [],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LogsMiddleware).forRoutes('*');
+  }
+}

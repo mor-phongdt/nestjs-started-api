@@ -5,12 +5,25 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  Get,
+  Req,
+  Res,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiExcludeEndpoint,
+  ApiOAuth2,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { Public } from './decorators/public.decorator';
 import { JwtAuthGuard } from './guards/jwt.guard';
+import { GoogleAuthGuard } from './guards/google.guard';
+import { Request, Response } from 'express';
+import { GithubAuthGuard } from './guards/github.guard';
 @ApiTags('auth')
 @Controller('api/auth')
 @Public()
@@ -56,5 +69,39 @@ export class AuthController {
   @Post('/reset')
   resetPassword(@Body() data: any) {
     return this.authService.resetPassword(data);
+  }
+
+  @ApiOAuth2(['profile', 'email'])
+  @UseGuards(GoogleAuthGuard)
+  @Get('/login/google')
+  signInGoogle() {
+    return { message: 'logged in using google' };
+  }
+
+  @ApiExcludeEndpoint()
+  @UseGuards(GoogleAuthGuard)
+  @Get('/google/redirect')
+  async googleCallback(@Req() req: Request, @Res() res: Response) {
+    const { access_token } = await this.authService.loginSocial(req);
+    res.redirect(
+      `${process.env.FE_URL}/oauth-success-redirect/${access_token}`,
+    );
+  }
+
+  @ApiOAuth2(['profile', 'email'])
+  @UseGuards(GithubAuthGuard)
+  @Get('/login/github')
+  signInGithub() {
+    return { message: 'logged in using github' };
+  }
+
+  @ApiExcludeEndpoint()
+  @UseGuards(GithubAuthGuard)
+  @Get('/github/callback')
+  async githubCallback(@Req() req: Request, @Res() res: Response) {
+    const { access_token } = await this.authService.loginSocial(req);
+    res.redirect(
+      `${process.env.FE_URL}/oauth-success-redirect/${access_token}`,
+    );
   }
 }
