@@ -6,21 +6,23 @@ import { PrismaService } from 'src/database/prisma.service';
 export class TemplatesService {
   constructor(private prisma: PrismaService) {}
 
-  async getListTemplates(limit: number, page: number) {
+  async getListTemplates(limit?: number, page?: number) {
     try {
       const LIMIT = 15;
       const data = await this.prisma.codeTemplates.findMany({
-        take: limit ? limit : LIMIT,
-        ...(limit && page && { skip: limit * (page - 1) }),
+        ...(limit && page && { take: limit ? limit : LIMIT }),
+        ...(limit &&
+          page && { skip: limit ? limit * (page - 1) : LIMIT * (page - 1) }),
       });
 
       const totalRecord = await this.prisma.codeTemplates.count();
 
       return {
+        statusCode: 200,
         data: {
           data: data,
           meta: {
-            page,
+            ...(page && { page }),
             limit: limit ? limit : LIMIT,
             totalPages: totalRecord ? Math.ceil(totalRecord / limit) : 0,
           },
@@ -35,7 +37,7 @@ export class TemplatesService {
     try {
       const data = await this.prisma.codeTemplates.findUnique({
         where: {
-          id,
+          id: Number(id),
         },
       });
 
@@ -66,7 +68,7 @@ export class TemplatesService {
     try {
       const template = await this.prisma.codeTemplates.findUnique({
         where: {
-          id,
+          id: Number(id),
         },
       });
 
@@ -76,7 +78,7 @@ export class TemplatesService {
 
       const update = await this.prisma.codeTemplates.update({
         where: {
-          id,
+          id: Number(id),
         },
         data,
       });
@@ -93,7 +95,7 @@ export class TemplatesService {
     try {
       const template = await this.prisma.codeTemplates.findUnique({
         where: {
-          id,
+          id: Number(id),
         },
       });
 
@@ -103,7 +105,7 @@ export class TemplatesService {
 
       const data = await this.prisma.codeTemplates.delete({
         where: {
-          id,
+          id: Number(id),
         },
       });
 

@@ -27,7 +27,7 @@ export class FrameworkService {
     try {
       const data = await this.prisma.languageFramework.findUnique({
         where: {
-          id,
+          id: Number(id),
         },
       });
 
@@ -72,7 +72,7 @@ export class FrameworkService {
     try {
       const data = await this.prisma.languageFramework.findUnique({
         where: {
-          id,
+          id: Number(id),
         },
       });
 
@@ -82,7 +82,7 @@ export class FrameworkService {
 
       const update = await this.prisma.languageFramework.update({
         where: {
-          id,
+          id: Number(id),
         },
         data: {
           name,
@@ -101,7 +101,7 @@ export class FrameworkService {
     try {
       const data = await this.prisma.languageFramework.findUnique({
         where: {
-          id,
+          id: Number(id),
         },
       });
 
@@ -111,7 +111,7 @@ export class FrameworkService {
 
       const deleted = await this.prisma.languageFramework.delete({
         where: {
-          id,
+          id: Number(id),
         },
       });
 
