@@ -61,6 +61,7 @@ model Challenge {
   framework            LanguageFramework      @relation(fields: [frameworkId], references: [id])
   submissionChallenge  SubmissionChallenge[]
   studySeriesChallenge StudySeriesChallenge[]
+  CodeTemplates        CodeTemplates[]
 }
 
 model SubmissionChallenge {
@@ -80,8 +81,8 @@ model SubmissionChallenge {
 
 model LanguageFramework {
   id        Int      @id @default(autoincrement())
-  name      String
-  imageUrl  String
+  name      String   @unique
+  imageUrl  String?
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 
@@ -134,6 +135,19 @@ model NewWords {
   word       String @unique
   definition Json
   example    String
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+}
+
+model CodeTemplates {
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
+  template    Json
+  challengeId Int
+
+  challenge Challenge @relation(fields: [challengeId], references: [id])
 
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
