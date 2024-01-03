@@ -7,9 +7,10 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { TemplatesService } from './templates.service';
 import { CodeTemplateDto } from './dto/code-templates.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
@@ -28,9 +29,20 @@ export class TemplatesController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Invalid credentials.',
   })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+  })
   @Get('list')
-  getListTemplates() {
-    return this.templateService.getListTemplates();
+  getListTemplates(
+    @Query('limit') limit?: number,
+    @Query('page') page?: number,
+  ) {
+    return this.templateService.getListTemplates(Number(limit), Number(page));
   }
 
   @UseGuards(JwtAuthGuard)

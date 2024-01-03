@@ -6,11 +6,26 @@ import { PrismaService } from 'src/database/prisma.service';
 export class TemplatesService {
   constructor(private prisma: PrismaService) {}
 
-  async getListTemplates() {
+  async getListTemplates(limit: number, page: number) {
     try {
-      const data = await this.prisma.codeTemplates.findMany({});
+      const LIMIT = 15;
+      const data = await this.prisma.codeTemplates.findMany({
+        take: limit ? limit : LIMIT,
+        ...(limit && page && { skip: limit * (page - 1) }),
+      });
 
-      return { data: data };
+      const totalRecord = await this.prisma.codeTemplates.count();
+
+      return {
+        data: {
+          data: data,
+          meta: {
+            page,
+            limit: limit ? limit : LIMIT,
+            totalPages: totalRecord ? Math.ceil(totalRecord / limit) : 0,
+          },
+        },
+      };
     } catch (err) {
       throw err;
     }
