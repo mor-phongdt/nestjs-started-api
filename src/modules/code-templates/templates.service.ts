@@ -133,8 +133,8 @@ export class TemplatesService {
     try {
       const template = await this.prisma.challengeLanguage.findFirst({
         where: {
-          challengeId,
-          frameworkId,
+          challengeId: Number(challengeId),
+          frameworkId: Number(frameworkId),
         },
       });
 
@@ -145,6 +145,12 @@ export class TemplatesService {
       const data = await this.prisma.challengeLanguage.findUnique({
         where: {
           id: Number(template.id),
+        },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          template: true,
         },
       });
 
