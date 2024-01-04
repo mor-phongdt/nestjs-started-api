@@ -1,9 +1,16 @@
 /*
   Warnings:
 
+  - You are about to drop the column `frameworkId` on the `Challenge` table. All the data in the column will be lost.
   - A unique constraint covering the columns `[name]` on the table `LanguageFramework` will be added. If there are existing duplicate values, this will fail.
 
 */
+-- DropForeignKey
+ALTER TABLE "Challenge" DROP CONSTRAINT "Challenge_frameworkId_fkey";
+
+-- AlterTable
+ALTER TABLE "Challenge" DROP COLUMN "frameworkId";
+
 -- AlterTable
 ALTER TABLE "LanguageFramework" ALTER COLUMN "imageUrl" DROP NOT NULL;
 
@@ -24,11 +31,19 @@ CREATE TABLE "CodeTemplates" (
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "template" JSONB NOT NULL,
-    "challengeId" INTEGER NOT NULL,
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "CodeTemplates_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ChallengeLanguage" (
+    "templateId" INTEGER NOT NULL,
+    "challengeId" INTEGER NOT NULL,
+    "frameworkId" INTEGER NOT NULL,
+
+    CONSTRAINT "ChallengeLanguage_pkey" PRIMARY KEY ("challengeId","frameworkId")
 );
 
 -- CreateIndex
@@ -41,4 +56,10 @@ ALTER TABLE "SeriesUser" ADD CONSTRAINT "SeriesUser_authorId_fkey" FOREIGN KEY (
 ALTER TABLE "SeriesUser" ADD CONSTRAINT "SeriesUser_seriesId_fkey" FOREIGN KEY ("seriesId") REFERENCES "StudySeries"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "CodeTemplates" ADD CONSTRAINT "CodeTemplates_challengeId_fkey" FOREIGN KEY ("challengeId") REFERENCES "Challenge"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ChallengeLanguage" ADD CONSTRAINT "ChallengeLanguage_templateId_fkey" FOREIGN KEY ("templateId") REFERENCES "CodeTemplates"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ChallengeLanguage" ADD CONSTRAINT "ChallengeLanguage_challengeId_fkey" FOREIGN KEY ("challengeId") REFERENCES "Challenge"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ChallengeLanguage" ADD CONSTRAINT "ChallengeLanguage_frameworkId_fkey" FOREIGN KEY ("frameworkId") REFERENCES "LanguageFramework"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

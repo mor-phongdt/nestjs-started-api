@@ -28,7 +28,7 @@ export class ChallengeService {
 
   async getListChallenge(): Promise<{ data: any[] }> {
     try {
-      const listChallenge = await this.prisma.challenge.findMany({
+      const listChallenge: any = await this.prisma.challenge.findMany({
         include: {
           author: {
             select: {
@@ -40,19 +40,24 @@ export class ChallengeService {
               position: true,
             },
           },
-          framework: {
+          challengeLanguage: {
             select: {
-              id: true,
-              name: true,
-              imageUrl: true,
+              framework: {
+                select: {
+                  id: true,
+                  name: true,
+                  imageUrl: true,
+                },
+              },
             },
           },
         },
       });
+
       if (listChallenge)
         return {
-          data: listChallenge.map((challenge) =>
-            excludeField(challenge, ['authorId', 'frameworkId']),
+          data: listChallenge.map((challenge: any) =>
+            excludeField(challenge, ['authorId']),
           ),
         };
     } catch (error) {
@@ -77,17 +82,29 @@ export class ChallengeService {
               position: true,
             },
           },
-          framework: {
+          challengeLanguage: {
             select: {
-              id: true,
-              name: true,
-              imageUrl: true,
+              framework: {
+                select: {
+                  id: true,
+                  name: true,
+                  imageUrl: true,
+                },
+              },
+              template: {
+                select: {
+                  id: true,
+                  name: true,
+                  description: true,
+                  template: true,
+                },
+              },
             },
           },
         },
       });
       if (challenge) {
-        return { data: excludeField(challenge, ['authorId', 'frameworkId']) };
+        return { data: excludeField(challenge, ['authorId']) };
       } else throw new NotFoundException('Challenge not found');
     } catch (error) {
       throw error;
@@ -166,7 +183,7 @@ export class ChallengeService {
       if (submissionChallenge) return { data: submissionChallenge };
       else throw new NotFoundException('Challenge not start');
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 }

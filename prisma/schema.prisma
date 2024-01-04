@@ -50,7 +50,6 @@ model Challenge {
   codeSolution        Json
   codeTest            Json
   solutionDescription String?
-  frameworkId         Int
   category            ChallengeCategory @default(value: coding)
   status              Int               @default(1)
   type                ChallengeType     @default(value: preview)
@@ -58,10 +57,9 @@ model Challenge {
   updatedAt           DateTime          @default(now()) @updatedAt @db.Timestamptz(3)
 
   author               User                   @relation(fields: [authorId], references: [id])
-  framework            LanguageFramework      @relation(fields: [frameworkId], references: [id])
   submissionChallenge  SubmissionChallenge[]
   studySeriesChallenge StudySeriesChallenge[]
-  CodeTemplates        CodeTemplates[]
+  challengeLanguage    ChallengeLanguage[]
 }
 
 model SubmissionChallenge {
@@ -86,7 +84,7 @@ model LanguageFramework {
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 
-  challenge Challenge[]
+  challengeLanguage ChallengeLanguage[]
 }
 
 model StudySeries {
@@ -145,10 +143,20 @@ model CodeTemplates {
   name        String
   description String
   template    Json
+
+  createdAt         DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime            @default(now()) @updatedAt @db.Timestamptz(3)
+  challengeLanguage ChallengeLanguage[]
+}
+
+model ChallengeLanguage {
+  templateId  Int
   challengeId Int
+  frameworkId Int
 
-  challenge Challenge @relation(fields: [challengeId], references: [id])
+  template  CodeTemplates     @relation(fields: [templateId], references: [id])
+  challenge Challenge         @relation(fields: [challengeId], references: [id])
+  framework LanguageFramework @relation(fields: [frameworkId], references: [id])
 
-  createdAt DateTime @default(now()) @db.Timestamptz(3)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+  @@id([challengeId, frameworkId])
 }

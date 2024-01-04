@@ -25,10 +25,6 @@ export class CodeTemplateDto {
   @ValidateNested()
   @ApiProperty()
   template: NestedJsonDto;
-
-  @ApiProperty()
-  @IsNumber()
-  challengeId: number;
 }
 
 export class PaginationQueryParams {

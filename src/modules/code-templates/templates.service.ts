@@ -116,4 +116,34 @@ export class TemplatesService {
       throw err;
     }
   }
+
+  async findTemplateByChallengeLanguage(
+    challengeId: number,
+    frameworkId: number,
+  ) {
+    try {
+      const template = await this.prisma.challengeLanguage.findUnique({
+        where: {
+          challengeId_frameworkId: {
+            challengeId: Number(challengeId),
+            frameworkId: Number(frameworkId),
+          },
+        },
+      });
+
+      if (!template) {
+        throw new NotFoundException();
+      }
+
+      const data = await this.prisma.codeTemplates.findUnique({
+        where: {
+          id: Number(template.templateId),
+        },
+      });
+
+      return { data: data };
+    } catch (err) {
+      throw err;
+    }
+  }
 }

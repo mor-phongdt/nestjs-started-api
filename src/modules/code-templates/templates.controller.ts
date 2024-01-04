@@ -69,6 +69,30 @@ export class TemplatesController {
     description: 'Success.',
   })
   @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Not found.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Invalid credentials.',
+  })
+  @Get(':challengeId/:frameworkId')
+  getTemplateByChallengeLanguage(
+    @Param('challengeId') challengeId: number,
+    @Param('frameworkId') frameworkId: number,
+  ) {
+    return this.templateService.findTemplateByChallengeLanguage(
+      challengeId,
+      frameworkId,
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Success.',
+  })
+  @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
     description: 'Invalid credentials.',
   })

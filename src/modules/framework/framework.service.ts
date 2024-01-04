@@ -14,7 +14,9 @@ export class FrameworkService {
     try {
       const list = await this.prisma.languageFramework.findMany({
         select: {
+          id: true,
           name: true,
+          imageUrl: true,
         },
       });
       return { data: list };
