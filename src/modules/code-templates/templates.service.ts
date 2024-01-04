@@ -6,16 +6,25 @@ import { PrismaService } from 'src/database/prisma.service';
 export class TemplatesService {
   constructor(private prisma: PrismaService) {}
 
-  async getListTemplates(limit?: number, page?: number) {
+  async getListTemplates(
+    limit?: number,
+    page?: number,
+    challengeId?: number,
+    frameworkId?: number,
+  ) {
     try {
       const LIMIT = 15;
-      const data = await this.prisma.codeTemplates.findMany({
+      const data = await this.prisma.challengeLanguage.findMany({
         ...(limit && page && { take: limit ? limit : LIMIT }),
         ...(limit &&
           page && { skip: limit ? limit * (page - 1) : LIMIT * (page - 1) }),
+        where: {
+          ...(challengeId && { challengeId }),
+          ...(frameworkId && { frameworkId }),
+        },
       });
 
-      const totalRecord = await this.prisma.codeTemplates.count();
+      const totalRecord = await this.prisma.challengeLanguage.count();
 
       return {
         statusCode: 200,
@@ -35,7 +44,7 @@ export class TemplatesService {
 
   async getDetailTemplate(id: number) {
     try {
-      const data = await this.prisma.codeTemplates.findUnique({
+      const data = await this.prisma.challengeLanguage.findUnique({
         where: {
           id: Number(id),
         },
@@ -51,9 +60,9 @@ export class TemplatesService {
     }
   }
 
-  async createTemplate(data: Prisma.CodeTemplatesUncheckedCreateInput) {
+  async createTemplate(data: Prisma.ChallengeLanguageUncheckedCreateInput) {
     try {
-      const template = await this.prisma.codeTemplates.create({
+      const template = await this.prisma.challengeLanguage.create({
         data,
       });
       if (template) {
@@ -66,7 +75,7 @@ export class TemplatesService {
 
   async updateTemplate(id: number, data: any) {
     try {
-      const template = await this.prisma.codeTemplates.findUnique({
+      const template = await this.prisma.challengeLanguage.findUnique({
         where: {
           id: Number(id),
         },
@@ -76,7 +85,7 @@ export class TemplatesService {
         throw new NotFoundException();
       }
 
-      const update = await this.prisma.codeTemplates.update({
+      const update = await this.prisma.challengeLanguage.update({
         where: {
           id: Number(id),
         },
@@ -93,7 +102,7 @@ export class TemplatesService {
 
   async deleteTemplate(id: number) {
     try {
-      const template = await this.prisma.codeTemplates.findUnique({
+      const template = await this.prisma.challengeLanguage.findUnique({
         where: {
           id: Number(id),
         },
@@ -103,7 +112,7 @@ export class TemplatesService {
         throw new NotFoundException();
       }
 
-      const data = await this.prisma.codeTemplates.delete({
+      const data = await this.prisma.challengeLanguage.delete({
         where: {
           id: Number(id),
         },
@@ -122,12 +131,10 @@ export class TemplatesService {
     frameworkId: number,
   ) {
     try {
-      const template = await this.prisma.challengeLanguage.findUnique({
+      const template = await this.prisma.challengeLanguage.findFirst({
         where: {
-          challengeId_frameworkId: {
-            challengeId: Number(challengeId),
-            frameworkId: Number(frameworkId),
-          },
+          challengeId,
+          frameworkId,
         },
       });
 
@@ -135,9 +142,9 @@ export class TemplatesService {
         throw new NotFoundException();
       }
 
-      const data = await this.prisma.codeTemplates.findUnique({
+      const data = await this.prisma.challengeLanguage.findUnique({
         where: {
-          id: Number(template.templateId),
+          id: Number(template.id),
         },
       });
 

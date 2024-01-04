@@ -138,25 +138,17 @@ model NewWords {
   updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 }
 
-model CodeTemplates {
-  id          Int    @id @default(autoincrement())
+model ChallengeLanguage {
+  id          Int               @unique @default(autoincrement())
   name        String
   description String
   template    Json
-
-  createdAt         DateTime            @default(now()) @db.Timestamptz(3)
-  updatedAt         DateTime            @default(now()) @updatedAt @db.Timestamptz(3)
-  challengeLanguage ChallengeLanguage[]
-}
-
-model ChallengeLanguage {
-  templateId  Int
   challengeId Int
   frameworkId Int
-
-  template  CodeTemplates     @relation(fields: [templateId], references: [id])
-  challenge Challenge         @relation(fields: [challengeId], references: [id])
-  framework LanguageFramework @relation(fields: [frameworkId], references: [id])
+  createdAt   DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime          @default(now()) @updatedAt @db.Timestamptz(3)
+  challenge   Challenge         @relation(fields: [challengeId], references: [id])
+  framework   LanguageFramework @relation(fields: [frameworkId], references: [id])
 
   @@id([challengeId, frameworkId])
 }

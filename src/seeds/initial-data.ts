@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import { codeSample, language, sampleMarkdown } from './users-data';
-const bcrypt = require('bcrypt');
+import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -34,14 +34,6 @@ async function seed() {
       data: language,
     });
     for (let i = 1; i <= 10; i++) {
-      await prisma.codeTemplates.create({
-        data: {
-          id: i,
-          name: `Template ${i}`,
-          description: `This is template ${i}`,
-          template: {},
-        },
-      });
       await prisma.challenge.create({
         data: {
           id: i,
@@ -55,9 +47,6 @@ async function seed() {
           codeSolution: JSON.stringify(codeSample),
           codeTest: JSON.stringify(codeSample),
           solutionDescription: sampleMarkdown,
-          // frameworkId: Number(
-          //   [1, 2, 3, 4, 5][Math.floor(Math.random() * [1, 2, 3, 4, 5].length)],
-          // ),
           category: [
             ChallengeCategoryEnum.coding,
             ChallengeCategoryEnum.system_design,
@@ -81,7 +70,10 @@ async function seed() {
       });
       await prisma.challengeLanguage.create({
         data: {
-          templateId: i,
+          id: i,
+          name: `Template ${i}`,
+          description: `This is template ${i}`,
+          template: JSON.stringify(codeSample),
           challengeId: i,
           frameworkId: Math.random() * 5 + 1,
         },

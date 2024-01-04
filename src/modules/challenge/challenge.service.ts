@@ -1,4 +1,3 @@
-import { language } from './../../seeds/users-data';
 import {
   Injectable,
   NotFoundException,
@@ -28,7 +27,7 @@ export class ChallengeService {
 
   async getListChallenge(): Promise<{ data: any[] }> {
     try {
-      const listChallenge: any = await this.prisma.challenge.findMany({
+      const listChallenge = await this.prisma.challenge.findMany({
         include: {
           author: {
             select: {
@@ -56,9 +55,14 @@ export class ChallengeService {
 
       if (listChallenge)
         return {
-          data: listChallenge.map((challenge: any) =>
-            excludeField(challenge, ['authorId']),
-          ),
+          data: listChallenge.map((challenge: any) => {
+            challenge.frameworks = [
+              ...challenge.challengeLanguage.map((item: any) => {
+                return { ...item.framework };
+              }),
+            ];
+            return excludeField(challenge, ['authorId', 'challengeLanguage']);
+          }),
         };
     } catch (error) {
       throw error;
@@ -67,7 +71,7 @@ export class ChallengeService {
 
   async getDetailChallenge(id: number): Promise<{ data: any }> {
     try {
-      const challenge = await this.prisma.challenge.findUnique({
+      const challenge: any = await this.prisma.challenge.findUnique({
         where: {
           id,
         },
@@ -91,20 +95,19 @@ export class ChallengeService {
                   imageUrl: true,
                 },
               },
-              template: {
-                select: {
-                  id: true,
-                  name: true,
-                  description: true,
-                  template: true,
-                },
-              },
             },
           },
         },
       });
       if (challenge) {
-        return { data: excludeField(challenge, ['authorId']) };
+        challenge.frameworks = [
+          ...challenge.challengeLanguage.map((item: any) => {
+            return { ...item.framework };
+          }),
+        ];
+        return {
+          data: excludeField(challenge, ['authorId', 'challengeLanguage']),
+        };
       } else throw new NotFoundException('Challenge not found');
     } catch (error) {
       throw error;

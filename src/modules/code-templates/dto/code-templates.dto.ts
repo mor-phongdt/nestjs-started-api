@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsNumber,
-  IsObject,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
+import { IsNumber, IsObject, IsString, ValidateNested } from 'class-validator';
 
 class NestedJsonDto {
   @ApiProperty({ example: 'nestedValue', description: 'Nested property value' })
@@ -25,14 +19,12 @@ export class CodeTemplateDto {
   @ValidateNested()
   @ApiProperty()
   template: NestedJsonDto;
-}
 
-export class PaginationQueryParams {
-  @IsOptional()
+  @ApiProperty()
   @IsNumber()
-  limit?: number;
+  challengeId: number;
 
-  @IsOptional()
+  @ApiProperty()
   @IsNumber()
-  page?: number;
+  frameworkId: number;
 }

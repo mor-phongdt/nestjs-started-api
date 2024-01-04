@@ -37,12 +37,27 @@ export class TemplatesController {
     name: 'limit',
     required: false,
   })
+  @ApiQuery({
+    name: 'challengeId',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'frameworkId',
+    required: false,
+  })
   @Get('list')
   getListTemplates(
     @Query('limit') limit?: number,
     @Query('page') page?: number,
+    @Query('challengeId') challengeId?: number,
+    @Query('frameworkId') frameworkId?: number,
   ) {
-    return this.templateService.getListTemplates(Number(limit), Number(page));
+    return this.templateService.getListTemplates(
+      Number(limit),
+      Number(page),
+      Number(challengeId),
+      Number(frameworkId),
+    );
   }
 
   @UseGuards(JwtAuthGuard)
