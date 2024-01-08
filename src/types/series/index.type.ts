@@ -9,6 +9,7 @@ export interface ISeriesRequest extends Omit<SeriesDto, 'listChallenge'> {
 }
 
 export interface ISeriesUpdate extends SeriesDto {
+ id: string
  authorId: number
 }
 
