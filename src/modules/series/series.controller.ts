@@ -30,16 +30,15 @@ export class SeriesController {
     }, seriesDto.listChallenge)
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @HttpCode(HttpStatus.OK)
-  // @Put('/update/:id')
-  // updateSeries(
-  //   @Param('id') id: string,
-  //   @Body() series: ISeriesUpdate,
-  //   @User() user: IUser
-  // ) {
-  //   return this.seriesService.updateSeries(series, user, id)
-  // }
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @Put('/update')
+  updateSeries(
+    @Body() series: ISeriesUpdate,
+    @User() user: IUser
+  ) {
+    return this.seriesService.updateSeries(series, user)
+  }
 
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
@@ -51,13 +50,23 @@ export class SeriesController {
     return this.seriesService.deleteSeries(id, user)
   }
 
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Get('/list?')
   getAllSeries(
     @Query('limit') limit: string,
-    @Query('page') page: string
+    @Query('page') page: string,
+    @User() user: IUser
   ) {
-    return this.seriesService.getAllSeries({ limit, page })
+    return this.seriesService.getAllSeries({ limit, page }, user)
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  getDetailSeries(
+    @Param('id') id: string,
+    @User() user: IUser
+  ) {
+    return this.seriesService.getDetailSeries(id, user)
+  }
 }
