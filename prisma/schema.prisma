@@ -36,6 +36,8 @@ model User {
   submissionChallenge SubmissionChallenge[]
   StudySeries         StudySeries[]
   seriesUser          SeriesUser[]
+  reviewSubmission    ReviewSubmission[]
+  readReview          ReadReview[]
 }
 
 model Challenge {
@@ -64,6 +66,7 @@ model Challenge {
 }
 
 model SubmissionChallenge {
+  id          Int       @id @default(autoincrement())
   challengeId Int
   userId      Int
   code        String?
@@ -75,7 +78,46 @@ model SubmissionChallenge {
   challenge   Challenge @relation(fields: [challengeId], references: [id])
   user        User      @relation(fields: [userId], references: [id])
 
-  @@id([challengeId, userId])
+  reviewSubmission ReviewSubmission[]
+
+  @@unique([challengeId, userId])
+}
+
+model ReviewSubmission {
+  id              Int      @id @default(autoincrement())
+  submissionId    Int
+  userId          Int
+  content         String
+  parentCommentId Int?
+  createdAt       DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+
+  user       User                @relation(fields: [userId], references: [id])
+  submission SubmissionChallenge @relation(fields: [submissionId], references: [id])
+
+  readReview ReadReview[]
+}
+
+model ReadReview {
+  reviewId Int
+  userId   Int
+  readAt   DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+
+  reviewSubmission ReviewSubmission @relation(fields: [reviewId], references: [id])
+  user             User             @relation(fields: [userId], references: [id])
+
+  @@id([reviewId, userId])
+}
+
+model ReactionReview {
+  reviewId Int
+  userId   Int
+
+  @@id([reviewId, userId])
+
 }
 
 model LanguageFramework {
