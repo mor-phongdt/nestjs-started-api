@@ -1,10 +1,8 @@
 import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { PrismaService } from "src/database/prisma.service";
-import { ChallengeCategory, Prisma, StudySeries } from "@prisma/client";
-import { PaginationQueryParams, SeriesDto, StudySeriesChallengeDto } from "./dto/series-dto";
+import { PaginationQueryParams } from "./dto/series-dto";
 import { IUser } from "src/types/user/index.type";
-import { IQueryParams, ISeriesRequest, ISeriesUpdate } from "src/types/series/index.type";
-
+import { ISeriesRequest, ISeriesUpdate } from "src/types/series/index.type";
 
 @Injectable()
 export class SeriesService {
@@ -13,11 +11,11 @@ export class SeriesService {
   async createSeries(seriesData: ISeriesRequest, listChallenge: Array<number>): Promise<{ message: string }> {
     try {
 
-      const series = await this.prisma.studySeries.create({
+      const series = listChallenge ? await this.prisma.studySeries.create({
         data: {
           ...seriesData,
         },
-      })
+      }) : { id: null }
 
       const users = await
         this.prisma.challenge.findMany({
@@ -75,37 +73,40 @@ export class SeriesService {
     }
   }
 
-  // async updateSeries(series: ISeriesUpdate, user: IUser, id: string): Promise<{ message: string }> {
-  //   try {
-  //     const _id = parseInt(id)
-  //     const currSeries = await this.prisma.studySeries.findUnique({
-  //       where: {
-  //         id: _id
-  //       }
-  //     })
+  async updateSeries(series: ISeriesUpdate, user: IUser): Promise<{ message: string }> {
+    try {
+      const { id, ...rest } = series
+      const _id = parseInt(id)
 
-  //     if (currSeries) {
-  //       if (user.id !== currSeries.authorId) {
-  //         throw new UnauthorizedException('You do not have permission to edit')
-  //       }
-  //     }
-  //     else {
-  //       throw new NotFoundException('Not found!')
-  //     }
+      const currSeries = await this.prisma.studySeries.findUnique({
+        where: {
+          id: _id
+        }
+      })
 
-  //     const upsertSeries = await this.prisma.studySeries.update({
-  //       where: {
-  //         id: parseInt(id)
-  //       },
-  //       data: {
-  //         ...series
-  //       }
-  //     })
-  //     return { message: 'hihi' }
-  //   } catch (error) {
+      if (currSeries) {
+        if (user.id !== currSeries.authorId) {
+          throw new UnauthorizedException('You do not have permission to edit')
+        }
+      }
+      else {
+        throw new NotFoundException('Not found!')
+      }
 
-  //   }
-  // }
+      const upsertSeries = await this.prisma.studySeries.update({
+        where: {
+          id: _id
+        },
+        data: {
+          ...rest
+        }
+      })
+      if (upsertSeries)
+        return { message: 'Updated' }
+    } catch (error) {
+
+    }
+  }
 
   async deleteSeries(id: string, user: IUser): Promise<{ message: string }> {
     try {
@@ -122,7 +123,7 @@ export class SeriesService {
     }
   }
 
-  async getAllSeries(query: PaginationQueryParams): Promise<{ data: any }> {
+  async getAllSeries(query: PaginationQueryParams, user: IUser): Promise<{ data: any }> {
     try {
       const _limit = parseInt(query.limit)
       const _page = parseInt(query.page)
@@ -139,6 +140,25 @@ export class SeriesService {
             select: {
               studySeriesChallenge: true,
             },
+          },
+          studySeriesChallenge: {
+            select: {
+              challenge: {
+                select: {
+                  spendTime: true,
+                  submissionChallenge: {
+                    where: {
+                      userId: user.id
+                    },
+                    select: {
+                      challengeId: true,
+                      userId: true,
+                      status: true
+                    }
+                  }
+                }
+              }
+            }
           },
           contributors: {
             select: {
@@ -163,9 +183,13 @@ export class SeriesService {
         }
       })
 
-      const flattenedListSeries = series.map(({ _count, contributors, ...item }) => ({
+      const flattenedListSeries = series.map(({ _count, contributors, studySeriesChallenge, ...item }) => ({
         ...item,
+        duration: studySeriesChallenge.reduce((acc, curr) => {
+          return acc + curr.challenge.spendTime
+        }, 0),
         challenges: _count.studySeriesChallenge,
+        progress: Math.floor(100 * studySeriesChallenge.filter(item => item.challenge.submissionChallenge[0]?.status === 999).length / _count.studySeriesChallenge) || 0,
         contributors: contributors.map(user => user.user),
       }))
 
@@ -187,4 +211,78 @@ export class SeriesService {
     }
   }
 
+  async getDetailSeries(id: string, user: IUser): Promise<{ data: any, message: string }> {
+    try {
+      const series = await this.prisma.studySeries.findMany({
+        where: {
+          id: parseInt(id)
+        },
+        select: {
+          id: true,
+          name: true,
+          authorId: true,
+          description: true,
+          image_url: true,
+          status: true,
+          updatedAt: true,
+          _count: {
+            select: {
+              studySeriesChallenge: true
+            }
+          },
+          studySeriesChallenge: {
+            select: {
+              challenge: {
+                select: {
+                  id: true,
+                  title: true,
+                  spendTime: true,
+                  submissionChallenge: {
+                    where: {
+                      userId: user.id
+                    },
+                    select: {
+                      status: true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          contributors: {
+            select: {
+              user: {
+                select:
+                {
+                  id: true,
+                  nickname: true,
+                  avatarUrl: true
+                }
+              }
+            }
+          }
+        }
+      })
+
+      const flattenedSeries = series.map(({ _count, studySeriesChallenge, contributors, ...item }) => ({
+        ...item,
+        duration: studySeriesChallenge.reduce((acc, curr) => {
+          return acc + curr.challenge.spendTime
+        }, 0),
+
+        count: _count.studySeriesChallenge,
+        challenges: studySeriesChallenge.map(item => ({
+          id: item.challenge.id,
+          title: item.challenge.title,
+          spendTime: item.challenge.spendTime,
+          status: item.challenge.submissionChallenge[0]?.status || 0
+        })),
+        contributors: contributors.map(user => user.user),
+      }))
+
+      return { data: flattenedSeries[0], message: flattenedSeries[0] ? 'Successfully' : 'Not found!' }
+    } catch (error) {
+      throw error
+    }
+  }
 }
