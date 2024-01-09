@@ -14,17 +14,6 @@ ALTER TABLE "Challenge" DROP COLUMN "frameworkId";
 -- AlterTable
 ALTER TABLE "LanguageFramework" ALTER COLUMN "imageUrl" DROP NOT NULL;
 
--- AlterTable
-ALTER TABLE "StudySeries" ADD COLUMN     "totalTime" INTEGER;
-
--- CreateTable
-CREATE TABLE "SeriesUser" (
-    "authorId" INTEGER NOT NULL,
-    "seriesId" INTEGER NOT NULL,
-
-    CONSTRAINT "SeriesUser_pkey" PRIMARY KEY ("authorId","seriesId")
-);
-
 -- CreateTable
 CREATE TABLE "ChallengeLanguage" (
     "id" SERIAL NOT NULL,
@@ -44,12 +33,6 @@ CREATE UNIQUE INDEX "ChallengeLanguage_id_key" ON "ChallengeLanguage"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "LanguageFramework_name_key" ON "LanguageFramework"("name");
-
--- AddForeignKey
-ALTER TABLE "SeriesUser" ADD CONSTRAINT "SeriesUser_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "SeriesUser" ADD CONSTRAINT "SeriesUser_seriesId_fkey" FOREIGN KEY ("seriesId") REFERENCES "StudySeries"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ChallengeLanguage" ADD CONSTRAINT "ChallengeLanguage_challengeId_fkey" FOREIGN KEY ("challengeId") REFERENCES "Challenge"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
