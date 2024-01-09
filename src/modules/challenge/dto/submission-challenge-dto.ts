@@ -1,6 +1,6 @@
 import {
   IsString,
-  Matches,
+  IsNumber,
   MaxLength,
   MinLength,
   IsObject,
@@ -26,4 +26,14 @@ export class SubmissionChallengeDto {
     description: '0: not completed,1:draft, 999: completed',
   })
   status: number;
+}
+
+export class ReviewChallengeDto {
+  @IsString()
+  @ApiProperty()
+  content: string;
+
+  @IsNumber()
+  @ApiProperty()
+  parentCommentId: number;
 }

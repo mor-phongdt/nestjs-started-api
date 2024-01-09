@@ -82,7 +82,6 @@ export class ChallengeService {
               email: true,
               nickname: true,
               avatarUrl: true,
-              theme_ide: true,
               position: true,
             },
           },
@@ -182,11 +181,108 @@ export class ChallengeService {
             },
           },
         });
-      console.log(submissionChallenge);
       if (submissionChallenge) return { data: submissionChallenge };
       else throw new NotFoundException('Challenge not start');
     } catch (error) {
       throw error;
+    }
+  }
+
+  async createReviewSubmission(
+    submissionId: number,
+    userId: number,
+    content: string,
+    parentCommentId: number,
+  ) {
+    try {
+      const result = await this.prisma.reviewSubmission.create({
+        data: {
+          content,
+          submissionId,
+          userId,
+          parentCommentId,
+        },
+      });
+      if (result) return { message: 'success' };
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async updateReviewSubmission(
+    reviewId: number,
+    userId: number,
+    content: string,
+  ) {
+    //TODO: need refactor
+    try {
+      const result = await this.prisma.reviewSubmission.update({
+        where: {
+          id: reviewId,
+        },
+        data: {
+          content,
+        },
+      });
+      if (result) return { message: 'success' };
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async getListCommentChallenge(submissionId: number) {
+    //TODO: need refactor
+    try {
+      const listComment = await this.prisma.reviewSubmission.findMany({
+        where: {
+          submissionId,
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              nickname: true,
+              avatarUrl: true,
+              position: true,
+            },
+          },
+        },
+      });
+      if (listComment) {
+        let conversation: any = {};
+        const parentComment = listComment.find(
+          (comment) => !comment.parentCommentId,
+        );
+        if (parentComment) {
+          conversation = {
+            ...parentComment,
+            listComment: listComment.filter(
+              (comment) => comment.parentCommentId,
+            ),
+          };
+        }
+
+        return {
+          data: conversation,
+        };
+      }
+    } catch (err) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async deleteReviewChallenge(commentId: number, userId: number) {
+    try {
+      //TODO: need refactor
+      const result = await this.prisma.reviewSubmission.delete({
+        where: {
+          id: commentId,
+        },
+      });
+      if (result) return { message: 'success' };
+    } catch (error) {
+      throw new InternalServerErrorException();
     }
   }
 }
