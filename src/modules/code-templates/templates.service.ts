@@ -27,7 +27,6 @@ export class TemplatesService {
       const totalRecord = await this.prisma.challengeLanguage.count();
 
       return {
-        statusCode: 200,
         data: {
           data: data,
           meta: {
@@ -46,7 +45,7 @@ export class TemplatesService {
     try {
       const data = await this.prisma.challengeLanguage.findUnique({
         where: {
-          id: Number(id),
+          id,
         },
       });
 
@@ -77,7 +76,7 @@ export class TemplatesService {
     try {
       const template = await this.prisma.challengeLanguage.findUnique({
         where: {
-          id: Number(id),
+          id,
         },
       });
 
@@ -87,7 +86,7 @@ export class TemplatesService {
 
       const update = await this.prisma.challengeLanguage.update({
         where: {
-          id: Number(id),
+          id,
         },
         data,
       });
@@ -104,7 +103,7 @@ export class TemplatesService {
     try {
       const template = await this.prisma.challengeLanguage.findUnique({
         where: {
-          id: Number(id),
+          id,
         },
       });
 
@@ -114,7 +113,7 @@ export class TemplatesService {
 
       const data = await this.prisma.challengeLanguage.delete({
         where: {
-          id: Number(id),
+          id,
         },
       });
 
@@ -133,8 +132,8 @@ export class TemplatesService {
     try {
       const template = await this.prisma.challengeLanguage.findFirst({
         where: {
-          challengeId: Number(challengeId),
-          frameworkId: Number(frameworkId),
+          challengeId,
+          frameworkId,
         },
       });
 
@@ -144,7 +143,7 @@ export class TemplatesService {
 
       const data = await this.prisma.challengeLanguage.findUnique({
         where: {
-          id: Number(template.id),
+          id: template.id,
         },
         select: {
           id: true,

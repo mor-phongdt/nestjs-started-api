@@ -12,7 +12,7 @@ export class UserService {
     try {
       const data = await this.prisma.user.findMany();
 
-      return { statusCode: '200', data: data };
+      return { data: data };
     } catch (error) {
       throw error;
     }
@@ -22,7 +22,7 @@ export class UserService {
     try {
       const user = await this.prisma.user.findUnique({
         where: {
-          id: Number(id),
+          id,
         },
         select: {
           id: true,
@@ -41,7 +41,7 @@ export class UserService {
         throw new NotFoundException();
       }
 
-      return { statusCode: '200', data: user };
+      return { data: user };
     } catch (error) {
       throw error;
     }
@@ -90,7 +90,7 @@ export class UserService {
     try {
       const user = await this.prisma.user.findUnique({
         where: {
-          id: Number(id),
+          id,
         },
         select: {
           id: true,
@@ -111,7 +111,7 @@ export class UserService {
 
       const deleteUser = await this.prisma.user.delete({
         where: {
-          id: Number(id),
+          id,
         },
       });
 
@@ -119,7 +119,7 @@ export class UserService {
         throw new InternalServerErrorException();
       }
 
-      return { statusCode: '200', message: 'deleted successfully' };
+      return { message: 'deleted successfully' };
     } catch (error) {
       throw error;
     }

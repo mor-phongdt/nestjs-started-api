@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Delete,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiTags, ApiResponse } from '@nestjs/swagger';
@@ -68,7 +69,7 @@ export class UserController {
     description: 'Unauthorized.',
   })
   @Get(':id')
-  getUserById(@Param('id') id: number): Promise<any> {
+  getUserById(@Param('id', ParseIntPipe) id: number): Promise<any> {
     return this.userService.getUserById(id);
   }
 
@@ -110,7 +111,7 @@ export class UserController {
     description: 'Not Found.',
   })
   @Delete(':id')
-  deleteUser(@Param('id') id: number): Promise<any> {
+  deleteUser(@Param('id', ParseIntPipe) id: number): Promise<any> {
     return this.userService.deleteUser(id);
   }
 }

@@ -5,6 +5,7 @@ import {
   Get,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   UseGuards,
@@ -47,7 +48,7 @@ export class FrameworkController {
     description: 'Invalid credentials.',
   })
   @Get(':id')
-  getDetailFramework(@Param('id') id: number) {
+  getDetailFramework(@Param('id', ParseIntPipe) id: number) {
     return this.frameworkService.getDetailFramework(id);
   }
 
@@ -83,7 +84,10 @@ export class FrameworkController {
     description: 'Invalid credentials.',
   })
   @Patch(':id')
-  updateFramework(@Param('id') id: number, @Body() body: FrameworkDto) {
+  updateFramework(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: FrameworkDto,
+  ) {
     return this.frameworkService.updateFramework(id, body);
   }
 
@@ -101,7 +105,7 @@ export class FrameworkController {
     description: 'Invalid credentials.',
   })
   @Delete(':id')
-  deleteFramework(@Param('id') id: number) {
+  deleteFramework(@Param('id', ParseIntPipe) id: number) {
     return this.frameworkService.deleteFramework(id);
   }
 }

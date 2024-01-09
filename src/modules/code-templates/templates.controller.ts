@@ -5,6 +5,7 @@ import {
   Get,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -47,16 +48,16 @@ export class TemplatesController {
   })
   @Get('list')
   getListTemplates(
-    @Query('limit') limit?: number,
-    @Query('page') page?: number,
-    @Query('challengeId') challengeId?: number,
-    @Query('frameworkId') frameworkId?: number,
+    @Query('limit', ParseIntPipe) limit?: number,
+    @Query('page', ParseIntPipe) page?: number,
+    @Query('challengeId', ParseIntPipe) challengeId?: number,
+    @Query('frameworkId', ParseIntPipe) frameworkId?: number,
   ) {
     return this.templateService.getListTemplates(
-      Number(limit),
-      Number(page),
-      Number(challengeId),
-      Number(frameworkId),
+      limit,
+      page,
+      challengeId,
+      frameworkId,
     );
   }
 
@@ -74,7 +75,7 @@ export class TemplatesController {
     description: 'Invalid credentials.',
   })
   @Get(':id')
-  getDetailTemplate(@Param('id') id: number) {
+  getDetailTemplate(@Param('id', ParseIntPipe) id: number) {
     return this.templateService.getDetailTemplate(id);
   }
 
@@ -93,8 +94,8 @@ export class TemplatesController {
   })
   @Get(':challengeId/:frameworkId')
   getTemplateByChallengeLanguage(
-    @Param('challengeId') challengeId: number,
-    @Param('frameworkId') frameworkId: number,
+    @Param('challengeId', ParseIntPipe) challengeId: number,
+    @Param('frameworkId', ParseIntPipe) frameworkId: number,
   ) {
     return this.templateService.findTemplateByChallengeLanguage(
       challengeId,
@@ -133,7 +134,10 @@ export class TemplatesController {
     description: 'Invalid credentials.',
   })
   @Patch(':id')
-  updateTemplate(@Param('id') id: number, @Body() body: CodeTemplateDto) {
+  updateTemplate(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: CodeTemplateDto,
+  ) {
     return this.templateService.updateTemplate(id, {
       ...body,
       template: JSON.stringify(body.template),
@@ -154,7 +158,7 @@ export class TemplatesController {
     description: 'Invalid credentials.',
   })
   @Delete(':id')
-  deleteTemplate(@Param('id') id: number) {
+  deleteTemplate(@Param('id', ParseIntPipe) id: number) {
     return this.templateService.deleteTemplate(id);
   }
 }
