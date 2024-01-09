@@ -6,6 +6,8 @@ import { ChallengeModule } from './modules/challenge/challenge.module';
 import { SeriesModule } from './modules/series/series.module';
 import { WordModule } from './modules/words/word.module';
 import { PrismaModule } from './database/prisma.module';
+import { FrameworkModule } from './modules/framework/framework.module';
+import { TemplatesModule } from './modules/code-templates/templates.module';
 import LogsMiddleware from './utils/logs.middleware';
 
 @Module({
@@ -19,6 +21,8 @@ import LogsMiddleware from './utils/logs.middleware';
     SeriesModule,
     WordModule,
     PrismaModule,
+    FrameworkModule,
+    TemplatesModule,
   ],
   controllers: [],
   providers: [],

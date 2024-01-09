@@ -29,7 +29,7 @@ import { GithubAuthGuard } from './guards/github.guard';
 @Controller('api/auth')
 @Public()
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @HttpCode(HttpStatus.OK)
   @Post('/signup')
@@ -82,11 +82,13 @@ export class AuthController {
   @ApiExcludeEndpoint()
   @UseGuards(GoogleAuthGuard)
   @Get('/google/redirect')
-  async googleCallback(@Req() req: Request, @Res() res: Response) {
+  async googleCallback(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Headers() header?: any,
+  ) {
     const { access_token } = await this.authService.loginSocial(req);
-    res.redirect(
-      `${process.env.FE_URL}/oauth-success-redirect/${access_token}`,
-    );
+    res.redirect(`${header.referer}/oauth-success-redirect/${access_token}`);
   }
 
   @ApiOAuth2(['profile', 'email'])
@@ -99,10 +101,12 @@ export class AuthController {
   @ApiExcludeEndpoint()
   @UseGuards(GithubAuthGuard)
   @Get('/github/callback')
-  async githubCallback(@Req() req: Request, @Res() res: Response, @Headers('referer') referer?: string) {
+  async githubCallback(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Headers() header?: any,
+  ) {
     const { access_token } = await this.authService.loginSocial(req);
-    res.redirect(
-      `${referer}/oauth-success-redirect/${access_token}`,
-    );
+    res.redirect(`${header.referer}/oauth-success-redirect/${access_token}`);
   }
 }

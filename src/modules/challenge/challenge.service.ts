@@ -39,20 +39,30 @@ export class ChallengeService {
               position: true,
             },
           },
-          framework: {
+          challengeLanguage: {
             select: {
-              id: true,
-              name: true,
-              imageUrl: true,
+              framework: {
+                select: {
+                  id: true,
+                  name: true,
+                  imageUrl: true,
+                },
+              },
             },
           },
         },
       });
+
       if (listChallenge)
         return {
-          data: listChallenge.map((challenge) =>
-            excludeField(challenge, ['authorId', 'frameworkId']),
-          ),
+          data: listChallenge.map((challenge: any) => {
+            challenge.frameworks = [
+              ...challenge.challengeLanguage.map((item: any) => {
+                return { ...item.framework };
+              }),
+            ];
+            return excludeField(challenge, ['authorId', 'challengeLanguage']);
+          }),
         };
     } catch (error) {
       throw error;
@@ -61,7 +71,7 @@ export class ChallengeService {
 
   async getDetailChallenge(id: number): Promise<{ data: any }> {
     try {
-      const challenge = await this.prisma.challenge.findUnique({
+      const challenge: any = await this.prisma.challenge.findUnique({
         where: {
           id,
         },
@@ -75,17 +85,28 @@ export class ChallengeService {
               position: true,
             },
           },
-          framework: {
+          challengeLanguage: {
             select: {
-              id: true,
-              name: true,
-              imageUrl: true,
+              framework: {
+                select: {
+                  id: true,
+                  name: true,
+                  imageUrl: true,
+                },
+              },
             },
           },
         },
       });
       if (challenge) {
-        return { data: excludeField(challenge, ['authorId', 'frameworkId']) };
+        challenge.frameworks = [
+          ...challenge.challengeLanguage.map((item: any) => {
+            return { ...item.framework };
+          }),
+        ];
+        return {
+          data: excludeField(challenge, ['authorId', 'challengeLanguage']),
+        };
       } else throw new NotFoundException('Challenge not found');
     } catch (error) {
       throw error;

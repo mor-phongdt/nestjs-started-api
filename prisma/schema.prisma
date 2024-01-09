@@ -52,7 +52,6 @@ model Challenge {
   codeSolution        Json
   codeTest            Json
   solutionDescription String?
-  frameworkId         Int
   category            ChallengeCategory @default(value: coding)
   status              Int               @default(1)
   type                ChallengeType     @default(value: preview)
@@ -60,9 +59,9 @@ model Challenge {
   updatedAt           DateTime          @default(now()) @updatedAt @db.Timestamptz(3)
 
   author               User                   @relation(fields: [authorId], references: [id])
-  framework            LanguageFramework      @relation(fields: [frameworkId], references: [id])
   submissionChallenge  SubmissionChallenge[]
   studySeriesChallenge StudySeriesChallenge[]
+  challengeLanguage    ChallengeLanguage[]
 }
 
 model SubmissionChallenge {
@@ -122,12 +121,12 @@ model ReactionReview {
 
 model LanguageFramework {
   id        Int      @id @default(autoincrement())
-  name      String
-  imageUrl  String
+  name      String   @unique
+  imageUrl  String?
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 
-  challenge Challenge[]
+  challengeLanguage ChallengeLanguage[]
 }
 
 model StudySeries {
@@ -179,4 +178,19 @@ model NewWords {
 
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+}
+
+model ChallengeLanguage {
+  id          Int               @unique @default(autoincrement())
+  name        String
+  description String
+  template    Json
+  challengeId Int
+  frameworkId Int
+  createdAt   DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime          @default(now()) @updatedAt @db.Timestamptz(3)
+  challenge   Challenge         @relation(fields: [challengeId], references: [id])
+  framework   LanguageFramework @relation(fields: [frameworkId], references: [id])
+
+  @@id([challengeId, frameworkId])
 }
