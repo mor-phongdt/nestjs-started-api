@@ -8,7 +8,7 @@ import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class FrameworkService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async getListFrameworks() {
     try {
@@ -25,7 +25,7 @@ export class FrameworkService {
     }
   }
 
-  async getDetailFramework(id: number) {
+  async getDetailFramework(id: string) {
     try {
       const data = await this.prisma.languageFramework.findUnique({
         where: {
@@ -68,7 +68,7 @@ export class FrameworkService {
   }
 
   async updateFramework(
-    id: number,
+    id: string,
     { name }: Prisma.LanguageFrameworkUpdateInput,
   ) {
     try {
@@ -99,7 +99,7 @@ export class FrameworkService {
     }
   }
 
-  async deleteFramework(id: number) {
+  async deleteFramework(id: string) {
     try {
       const data = await this.prisma.languageFramework.findUnique({
         where: {

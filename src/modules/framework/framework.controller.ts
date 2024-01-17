@@ -19,7 +19,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 @Controller('api/framework')
 @ApiBearerAuth()
 export class FrameworkController {
-  constructor(private readonly frameworkService: FrameworkService) {}
+  constructor(private readonly frameworkService: FrameworkService) { }
 
   @ApiResponse({
     status: HttpStatus.OK,
@@ -48,7 +48,7 @@ export class FrameworkController {
     description: 'Invalid credentials.',
   })
   @Get(':id')
-  getDetailFramework(@Param('id', ParseIntPipe) id: number) {
+  getDetailFramework(@Param('id') id: string) {
     return this.frameworkService.getDetailFramework(id);
   }
 
@@ -85,7 +85,7 @@ export class FrameworkController {
   })
   @Patch(':id')
   updateFramework(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() body: FrameworkDto,
   ) {
     return this.frameworkService.updateFramework(id, body);
@@ -105,7 +105,7 @@ export class FrameworkController {
     description: 'Invalid credentials.',
   })
   @Delete(':id')
-  deleteFramework(@Param('id', ParseIntPipe) id: number) {
+  deleteFramework(@Param('id') id: string) {
     return this.frameworkService.deleteFramework(id);
   }
 }

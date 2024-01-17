@@ -8,7 +8,7 @@ import { ISeriesRequest, ISeriesUpdate } from "src/types/series/index.type";
 export class SeriesService {
   constructor(private prisma: PrismaService) { }
 
-  async createSeries(seriesData: ISeriesRequest, listChallenge: Array<number>): Promise<{ message: string }> {
+  async createSeries(seriesData: ISeriesRequest, listChallenge: Array<string>): Promise<{ message: string }> {
     try {
 
       const series = listChallenge ? await this.prisma.studySeries.create({
@@ -30,7 +30,7 @@ export class SeriesService {
       const updateChallenges = await this.prisma.studySeriesChallenge.createMany({
         data: listChallenge.map(id => ({
           seriesId: series.id,
-          challengeId: Number(id)
+          challengeId: id
         })),
         skipDuplicates: true
       })
@@ -76,11 +76,10 @@ export class SeriesService {
   async updateSeries(series: ISeriesUpdate, user: IUser): Promise<{ message: string }> {
     try {
       const { id, ...rest } = series
-      const _id = parseInt(id)
 
       const currSeries = await this.prisma.studySeries.findUnique({
         where: {
-          id: _id
+          id: id
         }
       })
 
@@ -95,7 +94,7 @@ export class SeriesService {
 
       const upsertSeries = await this.prisma.studySeries.update({
         where: {
-          id: _id
+          id: id
         },
         data: {
           ...rest
@@ -112,7 +111,7 @@ export class SeriesService {
     return await this.prisma.$transaction(async () => {
       const series = await this.prisma.studySeries.findUnique({
         where: {
-          id: parseInt(id)
+          id: id
         }
       })
       if (series) {
@@ -120,17 +119,17 @@ export class SeriesService {
           await this.prisma.$transaction([
             this.prisma.studySeriesChallenge.deleteMany({
               where: {
-                seriesId: parseInt(id)
+                seriesId: id
               }
             }),
             this.prisma.seriesUser.deleteMany({
               where: {
-                seriesId: parseInt(id)
+                seriesId: id
               }
             }),
             this.prisma.studySeries.delete({
               where: {
-                id: parseInt(id),
+                id: id,
                 authorId: user.id
               }
             })
@@ -236,7 +235,7 @@ export class SeriesService {
     try {
       const series = await this.prisma.studySeries.findMany({
         where: {
-          id: parseInt(id)
+          id: id
         },
         select: {
           id: true,

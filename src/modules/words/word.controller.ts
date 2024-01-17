@@ -15,7 +15,7 @@ import { NewWordsDto } from './dto/word.dto';
 @ApiTags('words')
 @Controller('api/word')
 export class WordController {
-  constructor(private readonly wordService: WordService) {}
+  constructor(private readonly wordService: WordService) { }
 
   @ApiQuery({
     name: 'q',
@@ -69,7 +69,7 @@ export class WordController {
     description: 'Not Found.',
   })
   @Delete(':id')
-  deleteWord(@Param('id') id: number): Promise<any> {
+  deleteWord(@Param('id') id: string): Promise<any> {
     return this.wordService.deleteWord(id);
   }
 }

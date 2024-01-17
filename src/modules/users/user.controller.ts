@@ -14,7 +14,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { User } from './decorators/user.decorator';
 
 type UserType = {
-  id: number;
+  id: string;
   email: string;
   iat: number;
   exp: number;
@@ -26,7 +26,7 @@ export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -69,7 +69,7 @@ export class UserController {
     description: 'Unauthorized.',
   })
   @Get(':id')
-  getUserById(@Param('id', ParseIntPipe) id: number): Promise<any> {
+  getUserById(@Param('id') id: string): Promise<any> {
     return this.userService.getUserById(id);
   }
 
@@ -111,7 +111,7 @@ export class UserController {
     description: 'Not Found.',
   })
   @Delete(':id')
-  deleteUser(@Param('id', ParseIntPipe) id: number): Promise<any> {
+  deleteUser(@Param('id') id: string): Promise<any> {
     return this.userService.deleteUser(id);
   }
 }

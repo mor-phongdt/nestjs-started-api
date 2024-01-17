@@ -25,7 +25,7 @@ import {
 @Controller('api/challenge')
 @ApiBearerAuth()
 export class ChallengeController {
-  constructor(private readonly challengeService: ChallengeService) {}
+  constructor(private readonly challengeService: ChallengeService) { }
 
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
@@ -36,8 +36,8 @@ export class ChallengeController {
 
   @HttpCode(HttpStatus.OK)
   @Get(':id')
-  getDetailUserApi(@Param('id') id: number): Promise<any> {
-    return this.challengeService.getDetailChallenge(Number(id));
+  getDetailUserApi(@Param('id') id: string): Promise<any> {
+    return this.challengeService.getDetailChallenge(id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -53,7 +53,7 @@ export class ChallengeController {
       codeTemplate: JSON.stringify(challengeDto.codeTemplate),
       codeSolution: JSON.stringify(challengeDto.codeSolution),
       codeTest: JSON.stringify(challengeDto.codeTest),
-      authorId: Number(req.user.id),
+      authorId: req.user.id,
     });
   }
 
@@ -61,12 +61,12 @@ export class ChallengeController {
   @HttpCode(HttpStatus.OK)
   @Post(':id/start')
   startChallengeApi(
-    @Param('id') challengeId: number,
+    @Param('id') challengeId: string,
     @Request() req: Record<string, any>,
   ): Promise<{ message: string }> {
     return this.challengeService.startChallenge(
-      Number(challengeId),
-      Number(req.user.id),
+      challengeId,
+      req.user.id,
     );
   }
 
@@ -75,13 +75,13 @@ export class ChallengeController {
   @Put(':id/submission')
   @ApiBody({ type: SubmissionChallengeDto })
   saveResultChallengeApi(
-    @Param('id') challengeId: number,
+    @Param('id') challengeId: string,
     @Request() req: Record<string, any>,
     @Body() submitChallengeDto: SubmissionChallengeDto,
   ): Promise<{ message: string }> {
     return this.challengeService.saveResultChallenge(
-      Number(challengeId),
-      Number(req.user.id),
+      challengeId,
+      req.user.id,
       {
         ...submitChallengeDto,
         code: JSON.stringify(submitChallengeDto.code),
@@ -93,12 +93,12 @@ export class ChallengeController {
   @HttpCode(HttpStatus.OK)
   @Get(':id/submission')
   getSubmissionChallengeApi(
-    @Param('id', ParseIntPipe) challengeId: number,
+    @Param('id', ParseIntPipe) challengeId: string,
     @Request() req: Record<string, any>,
   ): Promise<{ data: any }> {
     return this.challengeService.getSubmissionChallenge(
       challengeId,
-      Number(req.user.id),
+      req.user.id,
     );
   }
 
@@ -108,13 +108,13 @@ export class ChallengeController {
   @Post(':id/submission/:submissionId/review')
   createReviewChallengeApi(
     @Param('id', ParseIntPipe) id: number,
-    @Param('submissionId', ParseIntPipe) submissionId: number,
+    @Param('submissionId', ParseIntPipe) submissionId: string,
     @Request() req: Record<string, any>,
     @Body() reviewChallengeDto: ReviewChallengeDto,
   ): Promise<{ message: string }> {
     return this.challengeService.createReviewSubmission(
       submissionId,
-      Number(req.user.id),
+      req.user.id,
       reviewChallengeDto.content,
       reviewChallengeDto.parentCommentId,
     );
@@ -127,7 +127,7 @@ export class ChallengeController {
   updateReviewChallengeApi(
     @Param('id', ParseIntPipe) id: number,
     @Param('submissionId', ParseIntPipe) submissionId: number,
-    @Param('reviewId', ParseIntPipe) reviewId: number,
+    @Param('reviewId', ParseIntPipe) reviewId: string,
     @Request() req: Record<string, any>,
     @Body() reviewChallengeDto: ReviewChallengeDto,
   ): Promise<{ message: string }> {
@@ -144,7 +144,7 @@ export class ChallengeController {
   deleteReviewReviewApi(
     @Param('id', ParseIntPipe) id: number,
     @Param('submissionId', ParseIntPipe) submissionId: number,
-    @Param('reviewId', ParseIntPipe) reviewId: number,
+    @Param('reviewId', ParseIntPipe) reviewId: string,
     @Request() req: Record<string, any>,
   ): Promise<{ message: string }> {
     //TODO: only author can update or delete comment
@@ -159,7 +159,7 @@ export class ChallengeController {
   @Get(':id/submission/:submissionId/conversation')
   getListCommentReviewApi(
     @Param('id', ParseIntPipe) id: number,
-    @Param('submissionId', ParseIntPipe) submissionId: number,
+    @Param('submissionId', ParseIntPipe) submissionId: string,
   ): Promise<{ data: any }> {
     return this.challengeService.getListCommentChallenge(submissionId);
   }

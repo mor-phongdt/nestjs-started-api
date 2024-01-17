@@ -21,7 +21,7 @@ enum ChallengeCategory {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
+  id        String    @id @default(uuid())
   email     String    @unique
   password  String
   nickname  String?
@@ -41,13 +41,13 @@ model User {
 }
 
 model Challenge {
-  id                  Int               @id @default(autoincrement())
+  id                  String            @id @default(uuid())
   title               String
   description         String
   spendTime           Int?
   userCompleted       Int?              @default(0)
   level               Int?
-  authorId            Int
+  authorId            String
   codeTemplate        Json
   codeSolution        Json
   codeTest            Json
@@ -65,9 +65,9 @@ model Challenge {
 }
 
 model SubmissionChallenge {
-  id          Int       @id @default(autoincrement())
-  challengeId Int
-  userId      Int
+  id          String    @id @default(uuid())
+  challengeId String
+  userId      String
   code        String?
   status      Int       @default(0)
   startTime   DateTime  @db.Timestamptz(3)
@@ -83,11 +83,11 @@ model SubmissionChallenge {
 }
 
 model ReviewSubmission {
-  id              Int      @id @default(autoincrement())
-  submissionId    Int
-  userId          Int
+  id              String   @id @default(uuid())
+  submissionId    String
+  userId          String
   content         String
-  parentCommentId Int?
+  parentCommentId String?
   createdAt       DateTime @default(now()) @db.Timestamptz(3)
   updatedAt       DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 
@@ -98,8 +98,8 @@ model ReviewSubmission {
 }
 
 model ReadReview {
-  reviewId Int
-  userId   Int
+  reviewId String
+  userId   String
   readAt   DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 
   createdAt DateTime @default(now()) @db.Timestamptz(3)
@@ -112,15 +112,14 @@ model ReadReview {
 }
 
 model ReactionReview {
-  reviewId Int
-  userId   Int
+  reviewId String
+  userId   String
 
   @@id([reviewId, userId])
-
 }
 
 model LanguageFramework {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   name      String   @unique
   imageUrl  String?
   createdAt DateTime @default(now()) @db.Timestamptz(3)
@@ -130,10 +129,10 @@ model LanguageFramework {
 }
 
 model StudySeries {
-  id Int @id @default(autoincrement())
+  id String @id @default(uuid())
 
-  authorId Int
-  user     User @relation(fields: [authorId], references: [id])
+  authorId String
+  user     User   @relation(fields: [authorId], references: [id])
 
   name        String
   description String
@@ -148,8 +147,8 @@ model StudySeries {
 }
 
 model StudySeriesChallenge {
-  seriesId    Int
-  challengeId Int
+  seriesId    String
+  challengeId String
 
   challenge   Challenge   @relation(fields: [challengeId], references: [id])
   studySeries StudySeries @relation(fields: [seriesId], references: [id])
@@ -161,8 +160,8 @@ model StudySeriesChallenge {
 }
 
 model SeriesUser {
-  authorId Int
-  seriesId Int
+  authorId String
+  seriesId String
 
   user   User        @relation(fields: [authorId], references: [id])
   series StudySeries @relation(fields: [seriesId], references: [id])
@@ -171,7 +170,7 @@ model SeriesUser {
 }
 
 model NewWords {
-  id         Int    @id @default(autoincrement())
+  id         String @id @default(uuid())
   word       String @unique
   definition Json
   example    String
@@ -181,12 +180,12 @@ model NewWords {
 }
 
 model ChallengeLanguage {
-  id          Int               @unique @default(autoincrement())
+  id          String            @unique @default(uuid())
   name        String
   description String
   template    Json
-  challengeId Int
-  frameworkId Int
+  challengeId String
+  frameworkId String
   createdAt   DateTime          @default(now()) @db.Timestamptz(3)
   updatedAt   DateTime          @default(now()) @updatedAt @db.Timestamptz(3)
   challenge   Challenge         @relation(fields: [challengeId], references: [id])

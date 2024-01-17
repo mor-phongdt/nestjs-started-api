@@ -10,7 +10,7 @@ import { excludeField } from 'src/utils';
 
 @Injectable()
 export class ChallengeService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async createChallenge(
     data: Prisma.ChallengeUncheckedCreateInput,
@@ -69,7 +69,7 @@ export class ChallengeService {
     }
   }
 
-  async getDetailChallenge(id: number): Promise<{ data: any }> {
+  async getDetailChallenge(id: string): Promise<{ data: any }> {
     try {
       const challenge: any = await this.prisma.challenge.findUnique({
         where: {
@@ -114,8 +114,8 @@ export class ChallengeService {
   }
 
   async startChallenge(
-    challengeId: number,
-    userId: number,
+    challengeId: string,
+    userId: string,
   ): Promise<{ message: string }> {
     try {
       const result = await this.prisma.submissionChallenge.create({
@@ -137,8 +137,8 @@ export class ChallengeService {
   }
 
   async saveResultChallenge(
-    challengeId: number,
-    userId: number,
+    challengeId: string,
+    userId: string,
     data: any,
   ): Promise<{ message: string }> {
     try {
@@ -168,8 +168,8 @@ export class ChallengeService {
   }
 
   async getSubmissionChallenge(
-    challengeId: number,
-    userId: number,
+    challengeId: string,
+    userId: string,
   ): Promise<{ data: any }> {
     try {
       const submissionChallenge =
@@ -189,10 +189,10 @@ export class ChallengeService {
   }
 
   async createReviewSubmission(
-    submissionId: number,
-    userId: number,
+    submissionId: string,
+    userId: string,
     content: string,
-    parentCommentId: number,
+    parentCommentId: string,
   ) {
     try {
       const result = await this.prisma.reviewSubmission.create({
@@ -210,7 +210,7 @@ export class ChallengeService {
   }
 
   async updateReviewSubmission(
-    reviewId: number,
+    reviewId: string,
     userId: number,
     content: string,
   ) {
@@ -230,7 +230,7 @@ export class ChallengeService {
     }
   }
 
-  async getListCommentChallenge(submissionId: number) {
+  async getListCommentChallenge(submissionId: string) {
     //TODO: need refactor
     try {
       const listComment = await this.prisma.reviewSubmission.findMany({
@@ -272,7 +272,7 @@ export class ChallengeService {
     }
   }
 
-  async deleteReviewChallenge(commentId: number, userId: number) {
+  async deleteReviewChallenge(commentId: string, userId: number) {
     try {
       //TODO: need refactor
       const result = await this.prisma.reviewSubmission.delete({

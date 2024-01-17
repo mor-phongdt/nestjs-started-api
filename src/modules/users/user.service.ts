@@ -6,7 +6,7 @@ import {
 import { PrismaService } from 'src/database/prisma.service';
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async getUsers(): Promise<any> {
     try {
@@ -18,7 +18,7 @@ export class UserService {
     }
   }
 
-  async getUserById(id: number): Promise<any> {
+  async getUserById(id: string): Promise<any> {
     try {
       const user = await this.prisma.user.findUnique({
         where: {
@@ -86,7 +86,7 @@ export class UserService {
   //   }
   // }
 
-  async deleteUser(id: number): Promise<any> {
+  async deleteUser(id: string): Promise<any> {
     try {
       const user = await this.prisma.user.findUnique({
         where: {
