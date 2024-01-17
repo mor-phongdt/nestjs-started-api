@@ -109,18 +109,39 @@ export class SeriesService {
   }
 
   async deleteSeries(id: string, user: IUser): Promise<{ message: string }> {
-    try {
-      const series = await this.prisma.studySeries.delete({
+    return await this.prisma.$transaction(async () => {
+      const series = await this.prisma.studySeries.findUnique({
         where: {
-          id: parseInt(id),
-          authorId: user.id
+          id: parseInt(id)
         }
       })
-      if (series)
-        return { message: 'Deleted Successfully' }
-    } catch (error) {
-      throw error
-    }
+      if (series) {
+        if (series.authorId === user.id) {
+          await this.prisma.$transaction([
+            this.prisma.studySeriesChallenge.deleteMany({
+              where: {
+                seriesId: parseInt(id)
+              }
+            }),
+            this.prisma.seriesUser.deleteMany({
+              where: {
+                seriesId: parseInt(id)
+              }
+            }),
+            this.prisma.studySeries.delete({
+              where: {
+                id: parseInt(id),
+                authorId: user.id
+              }
+            })
+          ])
+          return { message: 'Deleted' }
+        } else
+          return { message: '' }
+      } else {
+        return { message: '' }
+      }
+    })
   }
 
   async getAllSeries(query: PaginationQueryParams, user: IUser): Promise<{ data: any }> {
