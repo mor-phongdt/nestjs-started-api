@@ -5,6 +5,9 @@ import { IsOptional, IsString } from "class-validator";
 export class SeriesDto {
 
  @ApiProperty()
+ authorId: string;
+
+ @ApiProperty()
  name: string;
 
  @IsOptional()
@@ -20,14 +23,14 @@ export class SeriesDto {
 
  @IsOptional()
  @ApiProperty()
- listChallenge: Array<number>
+ listChallenge: Array<string>
 
 }
 
 export class StudySeriesChallengeDto extends SeriesDto {
 
  @ApiProperty()
- seriesId: number;
+ seriesId: string;
 
 }
 

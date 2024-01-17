@@ -2,6 +2,9 @@ import { PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import { codeSample, language, sampleMarkdown } from './users-data';
 import * as bcrypt from 'bcrypt';
+import { User } from 'src/modules/users/decorators/user.decorator';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/modules/auth/guards/jwt.guard';
 
 const prisma = new PrismaClient();
 
@@ -22,7 +25,6 @@ async function seed() {
       const password = await bcrypt.hash('admin', salt);
       await prisma.user.create({
         data: {
-          id: i,
           email: `admin${i}@gmail.com`,
           password: password,
           nickname: faker.internet.displayName(),
@@ -33,16 +35,16 @@ async function seed() {
     await prisma.languageFramework.createMany({
       data: language,
     });
+    const users = await prisma.user.findMany()
     for (let i = 1; i <= 10; i++) {
-      await prisma.challenge.create({
+      const challenge = await prisma.challenge.create({
         data: {
-          id: i,
           title: faker.lorem.slug(),
           description: sampleMarkdown,
           spendTime: 360,
           userCompleted: 0,
           level: [1, 2, 3][Math.floor(Math.random() * [1, 2, 3].length)],
-          authorId: i,
+          authorId: users[i]?.id,
           codeTemplate: JSON.stringify(codeSample),
           codeSolution: JSON.stringify(codeSample),
           codeTest: JSON.stringify(codeSample),
@@ -53,29 +55,29 @@ async function seed() {
           ][
             Math.floor(
               Math.random() *
-                [
-                  ChallengeCategoryEnum.coding,
-                  ChallengeCategoryEnum.system_design,
-                ].length,
+              [
+                ChallengeCategoryEnum.coding,
+                ChallengeCategoryEnum.system_design,
+              ].length,
             )
           ],
           status: 1,
           type: [ChallengeTypeEnum.preview, ChallengeTypeEnum.preview][
             Math.floor(
               Math.random() *
-                [ChallengeTypeEnum.preview, ChallengeTypeEnum.preview].length,
+              [ChallengeTypeEnum.preview, ChallengeTypeEnum.preview].length,
             )
           ],
         },
       });
+      const frameworks = await this.prisma.languageFramework.findMany()
       await prisma.challengeLanguage.create({
         data: {
-          id: i,
           name: `Template ${i}`,
           description: `This is template ${i}`,
           template: JSON.stringify(codeSample),
-          challengeId: i,
-          frameworkId: Math.random() * 5 + 1,
+          challengeId: challenge.id,
+          frameworkId: frameworks[i].id,
         },
       });
     }

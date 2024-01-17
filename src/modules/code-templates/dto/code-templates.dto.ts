@@ -22,9 +22,9 @@ export class CodeTemplateDto {
 
   @ApiProperty()
   @IsNumber()
-  challengeId: number;
+  challengeId: string;
 
   @ApiProperty()
   @IsNumber()
-  frameworkId: number;
+  frameworkId: string;
 }

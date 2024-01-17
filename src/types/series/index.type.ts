@@ -5,12 +5,12 @@ export interface IQueryParams extends PaginationQueryParams {
 }
 
 export interface ISeriesRequest extends Omit<SeriesDto, 'listChallenge'> {
- authorId: number
+ authorId: string
 }
 
 export interface ISeriesUpdate extends SeriesDto {
  id: string
- authorId: number
+ authorId: string
 }
 
 export type PaginationQueryParamsWithoutTab = Pick<PaginationQueryParams, 'limit' | 'page'>

@@ -9,7 +9,7 @@ import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class WordService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async getWords(q: string, page: string, limit: string): Promise<any> {
     try {
@@ -24,10 +24,10 @@ export class WordService {
       limit ? (args.take = parseInt(limit)) : delete args.take;
       q
         ? (args.where = {
-            word: {
-              contains: q,
-            },
-          })
+          word: {
+            contains: q,
+          },
+        })
         : delete args.where;
       // const data = await this.prisma.newWords.findMany(args);
       const [data, count] = await this.prisma.$transaction([
@@ -69,11 +69,11 @@ export class WordService {
     }
   }
 
-  async getWordById(id: number): Promise<any> {
+  async getWordById(id: string): Promise<any> {
     try {
       const word = await this.prisma.newWords.findUnique({
         where: {
-          id: Number(id),
+          id: id,
         },
       });
 
@@ -87,11 +87,11 @@ export class WordService {
     }
   }
 
-  async deleteWord(id: number): Promise<any> {
+  async deleteWord(id: string): Promise<any> {
     try {
       const word = await this.prisma.newWords.delete({
         where: {
-          id: Number(id),
+          id: id,
         },
       });
 

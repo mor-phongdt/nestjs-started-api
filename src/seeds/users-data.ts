@@ -1,31 +1,25 @@
 export const language = [
   {
-    id: 1,
     name: 'Javascript',
     imageUrl: '',
   },
   {
-    id: 2,
     name: 'Typescript',
     imageUrl: '',
   },
   {
-    id: 3,
     name: 'Html',
     imageUrl: '',
   },
   {
-    id: 4,
     name: 'Css',
     imageUrl: '',
   },
   {
-    id: 5,
     name: 'ReactJS',
     imageUrl: '',
   },
   {
-    id: 6,
     name: 'VueJs',
     imageUrl: '',
   },

@@ -20,7 +20,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 @ApiTags('templates')
 @Controller('api/templates')
 export class TemplatesController {
-  constructor(private readonly templateService: TemplatesService) {}
+  constructor(private readonly templateService: TemplatesService) { }
 
   @ApiResponse({
     status: HttpStatus.OK,
@@ -50,8 +50,8 @@ export class TemplatesController {
   getListTemplates(
     @Query('limit', ParseIntPipe) limit?: number,
     @Query('page', ParseIntPipe) page?: number,
-    @Query('challengeId', ParseIntPipe) challengeId?: number,
-    @Query('frameworkId', ParseIntPipe) frameworkId?: number,
+    @Query('challengeId') challengeId?: string,
+    @Query('frameworkId') frameworkId?: string,
   ) {
     return this.templateService.getListTemplates(
       limit,
@@ -75,7 +75,7 @@ export class TemplatesController {
     description: 'Invalid credentials.',
   })
   @Get(':id')
-  getDetailTemplate(@Param('id', ParseIntPipe) id: number) {
+  getDetailTemplate(@Param('id') id: string) {
     return this.templateService.getDetailTemplate(id);
   }
 
@@ -94,8 +94,8 @@ export class TemplatesController {
   })
   @Get(':challengeId/:frameworkId')
   getTemplateByChallengeLanguage(
-    @Param('challengeId', ParseIntPipe) challengeId: number,
-    @Param('frameworkId', ParseIntPipe) frameworkId: number,
+    @Param('challengeId') challengeId: string,
+    @Param('frameworkId') frameworkId: string,
   ) {
     return this.templateService.findTemplateByChallengeLanguage(
       challengeId,
@@ -135,7 +135,7 @@ export class TemplatesController {
   })
   @Patch(':id')
   updateTemplate(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() body: CodeTemplateDto,
   ) {
     return this.templateService.updateTemplate(id, {
@@ -158,7 +158,7 @@ export class TemplatesController {
     description: 'Invalid credentials.',
   })
   @Delete(':id')
-  deleteTemplate(@Param('id', ParseIntPipe) id: number) {
+  deleteTemplate(@Param('id') id: string) {
     return this.templateService.deleteTemplate(id);
   }
 }

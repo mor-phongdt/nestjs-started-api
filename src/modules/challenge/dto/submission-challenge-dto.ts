@@ -35,5 +35,5 @@ export class ReviewChallengeDto {
 
   @IsNumber()
   @ApiProperty()
-  parentCommentId: number;
+  parentCommentId: string;
 }

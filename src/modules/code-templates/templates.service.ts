@@ -4,13 +4,13 @@ import { PrismaService } from 'src/database/prisma.service';
 
 @Injectable()
 export class TemplatesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async getListTemplates(
     limit?: number,
     page?: number,
-    challengeId?: number,
-    frameworkId?: number,
+    challengeId?: string,
+    frameworkId?: string,
   ) {
     try {
       const LIMIT = 15;
@@ -41,7 +41,7 @@ export class TemplatesService {
     }
   }
 
-  async getDetailTemplate(id: number) {
+  async getDetailTemplate(id: string) {
     try {
       const data = await this.prisma.challengeLanguage.findUnique({
         where: {
@@ -72,7 +72,7 @@ export class TemplatesService {
     }
   }
 
-  async updateTemplate(id: number, data: any) {
+  async updateTemplate(id: string, data: any) {
     try {
       const template = await this.prisma.challengeLanguage.findUnique({
         where: {
@@ -99,7 +99,7 @@ export class TemplatesService {
     }
   }
 
-  async deleteTemplate(id: number) {
+  async deleteTemplate(id: string) {
     try {
       const template = await this.prisma.challengeLanguage.findUnique({
         where: {
@@ -126,8 +126,8 @@ export class TemplatesService {
   }
 
   async findTemplateByChallengeLanguage(
-    challengeId: number,
-    frameworkId: number,
+    challengeId: string,
+    frameworkId: string,
   ) {
     try {
       const template = await this.prisma.challengeLanguage.findFirst({
